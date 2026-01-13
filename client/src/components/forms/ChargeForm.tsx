@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertChargeSchema, InsertCharge } from "@shared/schema";
+import { insertChargeSchema, type InsertCharge } from "@shared/schema";
 import { useCreateCharge, useUploadFile } from "@/hooks/use-charges";
 import { useCompanies } from "@/hooks/use-companies";
 import { Button } from "@/components/ui/button";
@@ -191,18 +191,12 @@ export function ChargeForm() {
                 {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
               </FormItem>
             </div>
-            
+
             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={createCharge.isPending || boletoUploading}>
                 {createCharge.isPending ? "Salvando..." : "Criar Cobrança"}
               </Button>
             </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-}
           </form>
         </Form>
       </DialogContent>

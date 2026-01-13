@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertInvoiceSchema, InsertInvoice } from "@shared/schema";
+import { insertInvoiceSchema, type InsertInvoice } from "@shared/schema";
 import { useCreateInvoice, useUploadFile } from "@/hooks/use-invoices";
 import { useCharges } from "@/hooks/use-charges";
 import { Button } from "@/components/ui/button";
@@ -35,8 +35,8 @@ export function InvoiceForm() {
   const form = useForm<InsertInvoice>({
     resolver: zodResolver(insertInvoiceSchema),
     defaultValues: {
-      chargeId: undefined,
-      companyId: undefined,
+      chargeId: 0,
+      companyId: 0,
       fileUrl: "",
     },
   });
@@ -52,6 +52,7 @@ export function InvoiceForm() {
   };
 
   const onSubmit = (data: InsertInvoice) => {
+    if (!data.chargeId || !data.fileUrl) return;
     createInvoice.mutate(data, {
       onSuccess: () => {
         setOpen(false);
@@ -82,11 +83,12 @@ export function InvoiceForm() {
                   <FormLabel>Fatura / Cobrança</FormLabel>
                   <Select 
                     onValueChange={(val) => {
-                      const charge = charges?.find(c => c.id === Number(val));
-                      field.onChange(Number(val));
+                      const chargeId = Number(val);
+                      const charge = charges?.find(c => c.id === chargeId);
+                      field.onChange(chargeId);
                       if (charge) form.setValue("companyId", charge.companyId);
                     }} 
-                    defaultValue={field.value?.toString()}
+                    value={field.value?.toString()}
                   >
                     <FormControl>
                       <SelectTrigger>

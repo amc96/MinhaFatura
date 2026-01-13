@@ -10,7 +10,7 @@ import Login from "@/pages/auth/Login";
 import Dashboard from "@/pages/admin/Dashboard";
 import Companies from "@/pages/admin/Companies";
 import Charges from "@/pages/admin/Charges";
-import Invoices from "@/pages/admin/Invoices";
+import AdminInvoices from "@/pages/admin/Invoices";
 import Users from "@/pages/admin/Users";
 import MyCharges from "@/pages/company/MyCharges";
 import MyInvoices from "@/pages/company/MyInvoices";
@@ -21,7 +21,6 @@ function Router() {
     <Switch>
       <Route path="/login" component={Login} />
       
-      {/* Protected Routes - Wrapped in Layout */}
       <Route path="/admin/dashboard">
         <Layout><Dashboard /></Layout>
       </Route>
@@ -32,7 +31,7 @@ function Router() {
         <Layout><Charges /></Layout>
       </Route>
       <Route path="/admin/invoices">
-        <Layout><Invoices /></Layout>
+        <Layout><AdminInvoices /></Layout>
       </Route>
       <Route path="/admin/users">
         <Layout><Users /></Layout>
@@ -44,7 +43,6 @@ function Router() {
         <Layout><MyInvoices /></Layout>
       </Route>
 
-      {/* Redirect root to login */}
       <Route path="/">
         <Redirect to="/login" />
       </Route>

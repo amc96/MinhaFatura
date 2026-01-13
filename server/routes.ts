@@ -143,7 +143,7 @@ export async function registerRoutes(
     if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
     try {
       const input = api.invoices.create.input.parse(req.body);
-      const invoice = await storage.createInvoice(input);
+      const invoice = await storage.createInvoice(input as any);
       res.status(201).json(invoice);
     } catch (err) {
       if (err instanceof z.ZodError) {
