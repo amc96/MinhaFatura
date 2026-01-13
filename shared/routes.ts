@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertUserSchema, insertCompanySchema, insertChargeSchema, users, companies, charges } from './schema';
+import { insertUserSchema, insertCompanySchema, insertChargeSchema, insertInvoiceSchema, users, companies, charges, invoices } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -118,6 +118,27 @@ export const api = {
       responses: {
         200: z.object({ url: z.string() }),
         400: z.object({ message: z.string() }),
+      },
+    },
+  },
+  invoices: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/invoices',
+      input: z.object({
+        companyId: z.coerce.number().optional(),
+      }).optional(),
+      responses: {
+        200: z.array(z.custom<typeof invoices.$inferSelect & { charge: typeof charges.$inferSelect; company: typeof companies.$inferSelect }>()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/invoices',
+      input: insertInvoiceSchema,
+      responses: {
+        201: z.custom<typeof invoices.$inferSelect>(),
+        400: errorSchemas.validation,
       },
     },
   },

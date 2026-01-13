@@ -41,7 +41,6 @@ export function ChargeForm() {
       status: "pending",
       companyId: undefined,
       boletoFile: null,
-      invoiceFile: null,
     },
   });
 
@@ -174,11 +173,36 @@ export function ChargeForm() {
               />
             </div>
 
+            <div className="grid grid-cols-1 gap-4 pt-2">
+              <FormItem>
+                <FormLabel>Boleto (PDF/Imagem)</FormLabel>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    type="file" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file, "boletoFile", setBoletoUploading);
+                    }}
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    className="cursor-pointer"
+                  />
+                  {boletoUploading && <Upload className="w-4 h-4 animate-bounce text-primary" />}
+                </div>
+                {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
+              </FormItem>
+            </div>
+            
             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={createCharge.isPending || boletoUploading}>
                 {createCharge.isPending ? "Salvando..." : "Criar Cobrança"}
               </Button>
             </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
           </form>
         </Form>
       </DialogContent>

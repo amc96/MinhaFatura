@@ -6,7 +6,8 @@ import {
   Receipt, 
   Users, 
   LogOut,
-  PieChart
+  PieChart,
+  FileText
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -18,11 +19,13 @@ export function Sidebar() {
     { href: "/admin/dashboard", icon: LayoutDashboard, label: "Painel" },
     { href: "/admin/companies", icon: Building2, label: "Empresas" },
     { href: "/admin/charges", icon: Receipt, label: "Cobranças" },
+    { href: "/admin/invoices", icon: FileText, label: "Notas Fiscais" },
     { href: "/admin/users", icon: Users, label: "Usuários" },
   ];
 
   const companyLinks = [
     { href: "/portal/charges", icon: Receipt, label: "Minhas Cobranças" },
+    { href: "/portal/invoices", icon: FileText, label: "Minhas Notas Fiscais" },
   ];
 
   const links = user?.role === "admin" ? adminLinks : companyLinks;

@@ -10,8 +10,10 @@ import Login from "@/pages/auth/Login";
 import Dashboard from "@/pages/admin/Dashboard";
 import Companies from "@/pages/admin/Companies";
 import Charges from "@/pages/admin/Charges";
+import Invoices from "@/pages/admin/Invoices";
 import Users from "@/pages/admin/Users";
 import MyCharges from "@/pages/company/MyCharges";
+import MyInvoices from "@/pages/company/MyInvoices";
 import NotFound from "@/pages/NotFound";
 
 function Router() {
@@ -29,11 +31,17 @@ function Router() {
       <Route path="/admin/charges">
         <Layout><Charges /></Layout>
       </Route>
+      <Route path="/admin/invoices">
+        <Layout><Invoices /></Layout>
+      </Route>
       <Route path="/admin/users">
         <Layout><Users /></Layout>
       </Route>
       <Route path="/portal/charges">
         <Layout><MyCharges /></Layout>
+      </Route>
+      <Route path="/portal/invoices">
+        <Layout><MyInvoices /></Layout>
       </Route>
 
       {/* Redirect root to login */}

@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, companies, charges, type User, type InsertUser, type Company, type InsertCompany, type Charge, type InsertCharge } from "@shared/schema";
+import { users, companies, charges, invoices, type User, type InsertUser, type Company, type InsertCompany, type Charge, type InsertCharge, type Invoice, type InsertInvoice } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
@@ -15,8 +15,13 @@ export interface IStorage {
 
   // Charges
   getCharges(companyId?: number): Promise<(Charge & { company: Company })[]>;
+  getCharge(id: number): Promise<Charge | undefined>;
   createCharge(charge: InsertCharge): Promise<Charge>;
   payCharge(id: number, paymentMethod: string, paymentDate: string): Promise<Charge | undefined>;
+
+  // Invoices
+  getInvoices(companyId?: number): Promise<(Invoice & { charge: Charge; company: Company })[]>;
+  createInvoice(invoice: InsertInvoice): Promise<Invoice>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -58,7 +63,8 @@ export class DatabaseStorage implements IStorage {
         dueDate: charges.dueDate,
         status: charges.status,
         boletoFile: charges.boletoFile,
-        invoiceFile: charges.invoiceFile,
+        paymentMethod: charges.paymentMethod,
+        paymentDate: charges.paymentDate,
         createdAt: charges.createdAt,
         company: companies
       })
@@ -70,8 +76,13 @@ export class DatabaseStorage implements IStorage {
       query.where(eq(charges.companyId, companyId));
     }
 
-    // @ts-ignore - Drizzle join type inference can be tricky but structure matches
+    // @ts-ignore
     return await query; 
+  }
+
+  async getCharge(id: number): Promise<Charge | undefined> {
+    const [charge] = await db.select().from(charges).where(eq(charges.id, id));
+    return charge;
   }
 
   async createCharge(charge: InsertCharge): Promise<Charge> {
@@ -90,6 +101,34 @@ export class DatabaseStorage implements IStorage {
       .where(eq(charges.id, id))
       .returning();
     return updatedCharge;
+  }
+
+  async getInvoices(companyId?: number): Promise<(Invoice & { charge: Charge; company: Company })[]> {
+    const query = db.select({
+        id: invoices.id,
+        chargeId: invoices.chargeId,
+        companyId: invoices.companyId,
+        fileUrl: invoices.fileUrl,
+        createdAt: invoices.createdAt,
+        charge: charges,
+        company: companies
+      })
+      .from(invoices)
+      .innerJoin(charges, eq(invoices.chargeId, charges.id))
+      .innerJoin(companies, eq(invoices.companyId, companies.id))
+      .orderBy(desc(invoices.createdAt));
+
+    if (companyId) {
+      query.where(eq(invoices.companyId, companyId));
+    }
+
+    // @ts-ignore
+    return await query;
+  }
+
+  async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
+    const [newInvoice] = await db.insert(invoices).values(invoice).returning();
+    return newInvoice;
   }
 }
 

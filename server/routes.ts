@@ -126,6 +126,32 @@ export async function registerRoutes(
     }
   });
 
+  // === INVOICES ===
+  app.get(api.invoices.list.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    let companyId = req.query.companyId ? Number(req.query.companyId) : undefined;
+    if (req.user!.role === 'company') {
+      companyId = req.user!.companyId!;
+    }
+
+    const invoices = await storage.getInvoices(companyId);
+    res.json(invoices);
+  });
+
+  app.post(api.invoices.create.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const input = api.invoices.create.input.parse(req.body);
+      const invoice = await storage.createInvoice(input);
+      res.status(201).json(invoice);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: "Dados inválidos", errors: err.errors });
+      }
+    }
+  });
+
   app.patch(api.charges.pay.path.replace(':id', ':id'), async (req, res) => {
     if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
     try {
