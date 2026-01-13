@@ -126,6 +126,27 @@ export async function registerRoutes(
     }
   });
 
+  app.patch(api.charges.pay.path.replace(':id', ':id'), async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const input = api.charges.pay.input.parse(req.body);
+      const charge = await storage.payCharge(id, input.paymentMethod, input.paymentDate);
+      
+      if (!charge) {
+        return res.status(404).json({ message: "Cobrança não encontrada" });
+      }
+      
+      res.json(charge);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        res.status(400).json({ message: "Dados inválidos", errors: err.errors });
+      } else {
+        res.status(500).json({ message: "Erro ao processar pagamento" });
+      }
+    }
+  });
+
   // === UPLOAD ===
   app.post('/api/upload', upload.single('file'), (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

@@ -1,5 +1,6 @@
 import { useCharges } from "@/hooks/use-charges";
 import { ChargeForm } from "@/components/forms/ChargeForm";
+import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { 
@@ -78,6 +79,9 @@ export default function Charges() {
                           >
                             <FileText className="w-4 h-4" />
                           </Button>
+                        )}
+                        {charge.status !== 'paid' && (
+                          <PaymentForm chargeId={charge.id} chargeTitle={charge.title} />
                         )}
                       </div>
                     </TableCell>

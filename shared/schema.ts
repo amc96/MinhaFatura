@@ -30,6 +30,8 @@ export const charges = pgTable("charges", {
   status: text("status", { enum: ["pending", "paid", "overdue"] }).default("pending").notNull(),
   boletoFile: text("boleto_file"),
   invoiceFile: text("invoice_file"),
+  paymentMethod: text("payment_method"),
+  paymentDate: date("payment_date"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

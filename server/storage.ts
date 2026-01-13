@@ -16,6 +16,7 @@ export interface IStorage {
   // Charges
   getCharges(companyId?: number): Promise<(Charge & { company: Company })[]>;
   createCharge(charge: InsertCharge): Promise<Charge>;
+  payCharge(id: number, paymentMethod: string, paymentDate: string): Promise<Charge | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -76,6 +77,19 @@ export class DatabaseStorage implements IStorage {
   async createCharge(charge: InsertCharge): Promise<Charge> {
     const [newCharge] = await db.insert(charges).values(charge).returning();
     return newCharge;
+  }
+
+  async payCharge(id: number, paymentMethod: string, paymentDate: string): Promise<Charge | undefined> {
+    const [updatedCharge] = await db
+      .update(charges)
+      .set({ 
+        status: "paid",
+        paymentMethod,
+        paymentDate,
+      })
+      .where(eq(charges.id, id))
+      .returning();
+    return updatedCharge;
   }
 }
 

@@ -99,6 +99,19 @@ export const api = {
         400: errorSchemas.validation,
       },
     },
+    pay: {
+      method: 'PATCH' as const,
+      path: '/api/charges/:id/pay',
+      input: z.object({
+        paymentMethod: z.string().min(1, "Forma de pagamento é obrigatória"),
+        paymentDate: z.string().min(1, "Data de pagamento é obrigatória"),
+      }),
+      responses: {
+        200: z.custom<typeof charges.$inferSelect>(),
+        400: errorSchemas.validation,
+        404: errorSchemas.notFound,
+      },
+    },
     upload: {
       method: 'POST' as const,
       path: '/api/upload',
