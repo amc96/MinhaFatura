@@ -117,18 +117,28 @@ export async function registerRoutes(
     if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
     try {
       const input = api.charges.create.input.parse(req.body);
-      const { recurringCount = 1, intervalDays = 30, ...chargeData } = input as any;
+      const { recurringCount = 1, intervalDays = 30, installments, ...chargeData } = input as any;
       
       const createdCharges = [];
       const startDate = new Date(chargeData.dueDate);
 
       for (let i = 0; i < recurringCount; i++) {
-        const dueDate = new Date(startDate);
-        dueDate.setDate(startDate.getDate() + (i * intervalDays));
+        let dueDate: string;
+        let boletoFile: string | null = chargeData.boletoFile;
+
+        if (installments && installments[i]) {
+          dueDate = installments[i].dueDate;
+          boletoFile = installments[i].boletoFile || chargeData.boletoFile;
+        } else {
+          const d = new Date(startDate);
+          d.setDate(startDate.getDate() + (i * intervalDays));
+          dueDate = d.toISOString().split('T')[0];
+        }
         
         const charge = await storage.createCharge({
           ...chargeData,
-          dueDate: dueDate.toISOString().split('T')[0],
+          dueDate,
+          boletoFile,
           title: recurringCount > 1 ? `${chargeData.title} (${i + 1}/${recurringCount})` : chargeData.title,
         });
         createdCharges.push(charge);

@@ -30,9 +30,9 @@ export function ChargeForm() {
   const createCharge = useCreateCharge();
   const uploadFile = useUploadFile();
   
-  const [boletoUploading, setBoletoUploading] = useState(false);
+  const [boletoUploading, setBoletoUploading] = useState<Record<number, boolean>>({});
 
-  const form = useForm<InsertCharge & { recurringCount: number; intervalDays: number }>({
+  const form = useForm<InsertCharge & { recurringCount: number; intervalDays: number; installments: { dueDate: string; boletoFile: string | null }[] }>({
     resolver: zodResolver(insertChargeSchema),
     defaultValues: {
       title: "",
@@ -43,24 +43,49 @@ export function ChargeForm() {
       boletoFile: null,
       recurringCount: 1,
       intervalDays: 30,
+      installments: [],
     },
   });
 
+  const recurringCount = form.watch("recurringCount");
+  const intervalDays = form.watch("intervalDays");
+  const startDate = form.watch("dueDate");
+
+  const simulateInstallments = () => {
+    const count = form.getValues("recurringCount");
+    const interval = form.getValues("intervalDays");
+    const start = new Date(form.getValues("dueDate"));
+    
+    const newInstallments = Array.from({ length: count }).map((_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + (i * interval));
+      return {
+        dueDate: d.toISOString().split('T')[0],
+        boletoFile: null
+      };
+    });
+    form.setValue("installments", newInstallments);
+  };
+
   const handleFileUpload = async (
     file: File, 
-    field: "boletoFile",
-    setLoading: (l: boolean) => void
+    index: number
   ) => {
-    setLoading(true);
+    setBoletoUploading(prev => ({ ...prev, [index]: true }));
     try {
       const { url } = await uploadFile.mutateAsync(file);
-      form.setValue(field, url);
+      const current = form.getValues("installments");
+      current[index].boletoFile = url;
+      form.setValue("installments", [...current]);
     } finally {
-      setLoading(false);
+      setBoletoUploading(prev => ({ ...prev, [index]: false }));
     }
   };
 
-  const onSubmit = (data: InsertCharge & { recurringCount: number; intervalDays: number }) => {
+  const onSubmit = (data: InsertCharge & { recurringCount: number; intervalDays: number; installments: { dueDate: string; boletoFile: string | null }[] }) => {
+    // If multiple installments, we send them to the backend which handles bulk creation
+    // The backend route was already updated to handle recurringCount, but we might want to pass the specific files now.
+    // Let's adjust the backend to accept an array of installments if provided.
     createCharge.mutate(data, {
       onSuccess: () => {
         setOpen(false);
@@ -188,7 +213,9 @@ export function ChargeForm() {
                         min={1} 
                         max={12} 
                         {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          field.onChange(Number(e.target.value));
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -215,28 +242,66 @@ export function ChargeForm() {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 pt-2">
-              <FormItem>
-                <FormLabel>Boleto (PDF/Imagem)</FormLabel>
-                <div className="flex items-center gap-2">
-                  <Input 
-                    type="file" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, "boletoFile", setBoletoUploading);
-                    }}
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    className="cursor-pointer"
-                  />
-                  {boletoUploading && <Upload className="w-4 h-4 animate-bounce text-primary" />}
+            {recurringCount > 1 && (
+              <div className="space-y-4 border rounded-md p-4 bg-slate-50 dark:bg-slate-900">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">Simulação de Parcelas</h4>
+                  <Button type="button" variant="outline" size="sm" onClick={simulateInstallments}>
+                    Gerar Simulação
+                  </Button>
                 </div>
-                {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
-              </FormItem>
-            </div>
+                
+                <div className="space-y-3">
+                  {form.watch("installments").map((inst, idx) => (
+                    <div key={idx} className="flex items-center gap-4 text-xs p-2 border-b last:border-0">
+                      <span className="font-bold w-6">{idx + 1}º</span>
+                      <span className="flex-1">{inst.dueDate}</span>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="file" 
+                          className="h-8 w-40 text-[10px]"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, idx);
+                          }}
+                        />
+                        {boletoUploading[idx] && <Upload className="w-3 h-3 animate-bounce" />}
+                        {inst.boletoFile && <FileText className="w-3 h-3 text-green-500" />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {recurringCount === 1 && (
+              <div className="grid grid-cols-1 gap-4 pt-2">
+                <FormItem>
+                  <FormLabel>Boleto (PDF/Imagem)</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      type="file" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const upload = async () => {
+                            const { url } = await uploadFile.mutateAsync(file);
+                            form.setValue("boletoFile", url);
+                          };
+                          upload();
+                        }
+                      }}
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </FormItem>
+              </div>
+            )}
 
             <div className="flex justify-end pt-4">
-              <Button type="submit" disabled={createCharge.isPending || boletoUploading}>
-                {createCharge.isPending ? "Salvando..." : "Criar Cobrança"}
+              <Button type="submit" disabled={createCharge.isPending || Object.values(boletoUploading).some(Boolean)}>
+                {createCharge.isPending ? "Salvando..." : recurringCount > 1 ? "Simular e Gerar Parcelas" : "Criar Cobrança"}
               </Button>
             </div>
           </form>
