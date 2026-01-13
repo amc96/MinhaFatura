@@ -21,8 +21,8 @@ export default function Charges() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Charges</h1>
-          <p className="text-slate-500 mt-2">Track all invoices and payments.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Cobranças</h1>
+          <p className="text-slate-500 mt-2">Acompanhe todas as faturas e pagamentos.</p>
         </div>
         <ChargeForm />
       </div>
@@ -37,12 +37,12 @@ export default function Charges() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                  <TableHead>Title</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Due Date</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Empresa</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Vencimento</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Attachments</TableHead>
+                  <TableHead className="text-right">Anexos</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -63,7 +63,7 @@ export default function Charges() {
                             size="sm" 
                             className="h-8 w-8 p-0 text-slate-500 hover:text-primary"
                             onClick={() => window.open(charge.boletoFile!, '_blank')}
-                            title="View Boleto"
+                            title="Ver Boleto"
                           >
                             <Download className="w-4 h-4" />
                           </Button>
@@ -74,7 +74,7 @@ export default function Charges() {
                             size="sm" 
                             className="h-8 w-8 p-0 text-slate-500 hover:text-primary"
                             onClick={() => window.open(charge.invoiceFile!, '_blank')}
-                            title="View Invoice"
+                            title="Ver Nota Fiscal"
                           >
                             <FileText className="w-4 h-4" />
                           </Button>
@@ -86,7 +86,7 @@ export default function Charges() {
                 {charges?.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-slate-500">
-                      No charges found.
+                      Nenhuma cobrança encontrada.
                     </TableCell>
                   </TableRow>
                 )}

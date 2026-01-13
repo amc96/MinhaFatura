@@ -34,21 +34,21 @@ export default function MyCharges() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">My Charges</h1>
-        <p className="text-slate-500 mt-2">View your invoices and payment slips.</p>
+        <h1 className="text-3xl font-bold text-slate-900">Minhas Cobranças</h1>
+        <p className="text-slate-500 mt-2">Visualize suas faturas e boletos.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-amber-50 border-amber-100">
           <CardContent className="p-6">
-            <p className="text-amber-700 text-sm font-medium">Pending Payment</p>
+            <p className="text-amber-700 text-sm font-medium">Pagamento Pendente</p>
             <h3 className="text-2xl font-bold text-amber-900 mt-1">R$ {pendingAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
           </CardContent>
         </Card>
         <Card className="bg-red-50 border-red-100">
           <CardContent className="p-6 flex items-start justify-between">
             <div>
-              <p className="text-red-700 text-sm font-medium">Overdue</p>
+              <p className="text-red-700 text-sm font-medium">Atrasado</p>
               <h3 className="text-2xl font-bold text-red-900 mt-1">R$ {overdueAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
             </div>
             {overdueAmount > 0 && <AlertCircle className="text-red-500 w-6 h-6" />}
@@ -61,11 +61,11 @@ export default function MyCharges() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                <TableHead>Description</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Due Date</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Vencimento</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -90,7 +90,7 @@ export default function MyCharges() {
                           Boleto
                         </Button>
                       ) : (
-                        <span className="text-xs text-muted-foreground mr-2">No boleto</span>
+                        <span className="text-xs text-muted-foreground mr-2">Sem boleto</span>
                       )}
                       
                       {charge.invoiceFile && (
@@ -99,7 +99,7 @@ export default function MyCharges() {
                           size="sm" 
                           className="h-9 w-9 p-0"
                           onClick={() => window.open(charge.invoiceFile!, '_blank')}
-                          title="Invoice"
+                          title="Nota Fiscal"
                         >
                           <FileText className="w-4 h-4" />
                         </Button>
@@ -111,7 +111,7 @@ export default function MyCharges() {
               {charges?.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                    You have no charges at the moment.
+                    Você não possui cobranças no momento.
                   </TableCell>
                 </TableRow>
               )}

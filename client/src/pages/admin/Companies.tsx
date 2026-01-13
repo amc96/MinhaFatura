@@ -19,8 +19,8 @@ export default function Companies() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Companies</h1>
-          <p className="text-slate-500 mt-2">Manage registered client companies.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Empresas</h1>
+          <p className="text-slate-500 mt-2">Gerencie as empresas clientes cadastradas.</p>
         </div>
         <CompanyForm />
       </div>
@@ -35,11 +35,11 @@ export default function Companies() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                  <TableHead className="w-[300px]">Company Name</TableHead>
-                  <TableHead>Document</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Address</TableHead>
-                  <TableHead>Registered</TableHead>
+                  <TableHead className="w-[300px]">Nome da Empresa</TableHead>
+                  <TableHead>Documento</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Endereço</TableHead>
+                  <TableHead>Cadastrada em</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -76,7 +76,7 @@ export default function Companies() {
                 {companies?.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                      No companies found. Create one to get started.
+                      Nenhuma empresa encontrada. Crie uma para começar.
                     </TableCell>
                   </TableRow>
                 )}

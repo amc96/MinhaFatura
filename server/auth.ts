@@ -43,21 +43,12 @@ export function setupAuth(app: Express) {
       try {
         const user = await storage.getUserByUsername(username);
         if (!user) {
-          return done(null, false, { message: "Invalid username" });
+          return done(null, false, { message: "Usuário inválido" });
         }
-        
-        // In a real app with registration, we'd hash. 
-        // For seeded admin, we might need a way to set initial password.
-        // For MVP, if password matches directly OR hash comparison
-        // Let's assume seeded users have hashed passwords, but for simplicity in seeding:
-        // We will implement hash comparison.
-        
-        // If password is plain text (migration/seed issue), handle it? 
-        // No, let's strictly use hashing.
         
         const isValid = await comparePasswords(password, user.password);
         if (!isValid) {
-          return done(null, false, { message: "Invalid password" });
+          return done(null, false, { message: "Senha inválida" });
         }
 
         return done(null, user);
@@ -76,7 +67,7 @@ export function setupAuth(app: Express) {
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
       if (err) return next(err);
-      if (!user) return res.status(401).json({ message: info?.message || "Login failed" });
+      if (!user) return res.status(401).json({ message: info?.message || "Falha no login" });
       req.login(user, (err) => {
         if (err) return next(err);
         res.status(200).json(user);
@@ -111,7 +102,7 @@ export function setupAuth(app: Express) {
         // Let's hash here.
         const existingUser = await storage.getUserByUsername(req.body.username);
         if (existingUser) {
-            return res.status(400).json({ message: "Username already exists" });
+            return res.status(400).json({ message: "Nome de usuário já existe" });
         }
 
         const hashedPassword = await hashPassword(req.body.password);

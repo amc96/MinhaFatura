@@ -48,8 +48,8 @@ export default function Users() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-2xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
-        <p className="text-slate-500 mt-2">Create access credentials for companies or new admins.</p>
+        <h1 className="text-3xl font-bold text-slate-900">Gestão de Usuários</h1>
+        <p className="text-slate-500 mt-2">Crie credenciais de acesso para empresas ou novos administradores.</p>
       </div>
 
       <Card>
@@ -59,8 +59,8 @@ export default function Users() {
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
-              <CardTitle>Create New User</CardTitle>
-              <CardDescription>Add a new user to the system</CardDescription>
+              <CardTitle>Criar Novo Usuário</CardTitle>
+              <CardDescription>Adicione um novo usuário ao sistema</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -72,9 +72,9 @@ export default function Users() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>Usuário</FormLabel>
                     <FormControl>
-                      <Input placeholder="username" {...field} />
+                      <Input placeholder="nome_usuario" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -85,7 +85,7 @@ export default function Users() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Senha</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
@@ -98,16 +98,16 @@ export default function Users() {
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
+                    <FormLabel>Função</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select role" />
+                          <SelectValue placeholder="Selecione a função" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="company">Company User</SelectItem>
-                        <SelectItem value="admin">Administrator</SelectItem>
+                        <SelectItem value="company">Usuário de Empresa</SelectItem>
+                        <SelectItem value="admin">Administrador</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -121,14 +121,14 @@ export default function Users() {
                   name="companyId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Assign to Company</FormLabel>
+                      <FormLabel>Vincular à Empresa</FormLabel>
                       <Select 
                         onValueChange={(val) => field.onChange(val ? Number(val) : null)} 
                         defaultValue={field.value?.toString()}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select company" />
+                            <SelectValue placeholder="Selecione a empresa" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -146,7 +146,7 @@ export default function Users() {
               )}
 
               <Button type="submit" className="w-full btn-primary" disabled={registerMutation.isPending}>
-                {registerMutation.isPending ? "Creating..." : "Create User"}
+                {registerMutation.isPending ? "Criando..." : "Criar Usuário"}
               </Button>
             </form>
           </Form>

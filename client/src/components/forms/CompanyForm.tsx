@@ -44,12 +44,12 @@ export function CompanyForm() {
       <DialogTrigger asChild>
         <Button className="btn-primary gap-2">
           <Plus className="w-4 h-4" />
-          Add Company
+          Adicionar Empresa
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Register New Company</DialogTitle>
+          <DialogTitle>Cadastrar Nova Empresa</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
@@ -58,7 +58,7 @@ export function CompanyForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Company Name</FormLabel>
+                  <FormLabel>Nome da Empresa</FormLabel>
                   <FormControl>
                     <Input placeholder="Acme Inc." {...field} />
                   </FormControl>
@@ -71,7 +71,7 @@ export function CompanyForm() {
               name="document"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Document (CNPJ/CPF)</FormLabel>
+                  <FormLabel>Documento (CNPJ/CPF)</FormLabel>
                   <FormControl>
                     <Input placeholder="00.000.000/0000-00" {...field} />
                   </FormControl>
@@ -84,9 +84,9 @@ export function CompanyForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="contact@acme.com" {...field} />
+                    <Input type="email" placeholder="contato@acme.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,9 +97,9 @@ export function CompanyForm() {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>Endereço</FormLabel>
                   <FormControl>
-                    <Input placeholder="123 Business Rd." value={field.value || ''} onChange={field.onChange} />
+                    <Input placeholder="Rua Business, 123" value={field.value || ''} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +107,7 @@ export function CompanyForm() {
             />
             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={createCompany.isPending}>
-                {createCompany.isPending ? "Creating..." : "Create Company"}
+                {createCompany.isPending ? "Criando..." : "Criar Empresa"}
               </Button>
             </div>
           </form>

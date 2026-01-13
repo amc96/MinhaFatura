@@ -74,12 +74,12 @@ export function ChargeForm() {
       <DialogTrigger asChild>
         <Button className="btn-primary gap-2">
           <Plus className="w-4 h-4" />
-          New Charge
+          Nova Cobrança
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] overflow-y-auto max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Create New Charge</DialogTitle>
+          <DialogTitle>Criar Nova Cobrança</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
@@ -89,11 +89,11 @@ export function ChargeForm() {
                 name="companyId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company</FormLabel>
+                    <FormLabel>Empresa</FormLabel>
                     <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={field.value?.toString()}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select company" />
+                          <SelectValue placeholder="Selecione a empresa" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -121,9 +121,9 @@ export function ChargeForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="paid">Paid</SelectItem>
-                        <SelectItem value="overdue">Overdue</SelectItem>
+                        <SelectItem value="pending">Pendente</SelectItem>
+                        <SelectItem value="paid">Pago</SelectItem>
+                        <SelectItem value="overdue">Atrasado</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -137,9 +137,9 @@ export function ChargeForm() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title / Description</FormLabel>
+                  <FormLabel>Título / Descrição</FormLabel>
                   <FormControl>
-                    <Input placeholder="Monthly Service Fee" {...field} />
+                    <Input placeholder="Taxa de Serviço Mensal" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,7 +152,7 @@ export function ChargeForm() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount (R$)</FormLabel>
+                    <FormLabel>Valor (R$)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
@@ -165,7 +165,7 @@ export function ChargeForm() {
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Due Date</FormLabel>
+                    <FormLabel>Data de Vencimento</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -177,7 +177,7 @@ export function ChargeForm() {
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <FormItem>
-                <FormLabel>Boleto (PDF/Image)</FormLabel>
+                <FormLabel>Boleto (PDF/Imagem)</FormLabel>
                 <div className="flex items-center gap-2">
                   <Input 
                     type="file" 
@@ -190,11 +190,11 @@ export function ChargeForm() {
                   />
                   {boletoUploading && <Upload className="w-4 h-4 animate-bounce text-primary" />}
                 </div>
-                {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Uploaded</p>}
+                {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
               </FormItem>
 
               <FormItem>
-                <FormLabel>Invoice (NF-e)</FormLabel>
+                <FormLabel>Nota Fiscal (NF-e)</FormLabel>
                 <div className="flex items-center gap-2">
                   <Input 
                     type="file" 
@@ -207,13 +207,13 @@ export function ChargeForm() {
                   />
                   {invoiceUploading && <Upload className="w-4 h-4 animate-bounce text-primary" />}
                 </div>
-                {form.watch("invoiceFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Uploaded</p>}
+                {form.watch("invoiceFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
               </FormItem>
             </div>
 
             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={createCharge.isPending || boletoUploading || invoiceUploading}>
-                {createCharge.isPending ? "Saving..." : "Create Charge"}
+                {createCharge.isPending ? "Salvando..." : "Criar Cobrança"}
               </Button>
             </div>
           </form>
