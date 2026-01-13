@@ -11,7 +11,6 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Download, FileText, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 
@@ -27,11 +26,10 @@ export default function MyCharges() {
     );
   }
 
-  const chargesWithInvoices = charges?.filter(c => c.invoiceFile);
   const pendingAmount = charges?.filter(c => c.status === 'pending').reduce((acc, curr) => Number(acc) + Number(curr.amount), 0) || 0;
   const overdueAmount = charges?.filter(c => c.status === 'overdue').reduce((acc, curr) => Number(acc) + Number(curr.amount), 0) || 0;
 
-  const ChargeTable = ({ data, emptyMessage }: { data: typeof charges, emptyMessage: string }) => (
+  const ChargeTable = ({ data, emptyMessage }: { data: any, emptyMessage: string }) => (
     <Table>
       <TableHeader>
         <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
@@ -118,23 +116,11 @@ export default function MyCharges() {
         </Card>
       </div>
 
-      <Tabs defaultValue="charges" className="w-full">
-        <TabsList className="grid w-full max-w-[400px] grid-cols-2 mb-4">
-          <TabsTrigger value="charges">Faturas</TabsTrigger>
-          <TabsTrigger value="invoices">Notas Fiscais</TabsTrigger>
-        </TabsList>
-
-        <Card className="border-border/50 shadow-sm">
-          <CardContent className="p-0">
-            <TabsContent value="charges" className="mt-0">
-              <ChargeTable data={charges} emptyMessage="Você não possui faturas no momento." />
-            </TabsContent>
-            <TabsContent value="invoices" className="mt-0">
-              <ChargeTable data={chargesWithInvoices} emptyMessage="Você não possui notas fiscais no momento." />
-            </TabsContent>
-          </CardContent>
-        </Card>
-      </Tabs>
+      <Card className="border-border/50 shadow-sm">
+        <CardContent className="p-0">
+          <ChargeTable data={charges} emptyMessage="Você não possui faturas no momento." />
+        </CardContent>
+      </Card>
     </div>
   );
 }

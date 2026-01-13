@@ -12,16 +12,13 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Charges() {
   const { data: charges, isLoading } = useCharges();
 
-  const chargesWithInvoices = charges?.filter(c => c.invoiceFile);
-
-  const ChargeTable = ({ data, emptyMessage }: { data: typeof charges, emptyMessage: string }) => (
+  const ChargeTable = ({ data, emptyMessage }: { data: any, emptyMessage: string }) => (
     <Table>
       <TableHeader>
         <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
@@ -98,31 +95,17 @@ export default function Charges() {
         <ChargeForm />
       </div>
 
-      <Tabs defaultValue="charges" className="w-full">
-        <TabsList className="grid w-full max-w-[400px] grid-cols-2 mb-4">
-          <TabsTrigger value="charges">Cobranças</TabsTrigger>
-          <TabsTrigger value="invoices">Notas Fiscais</TabsTrigger>
-        </TabsList>
-
-        <Card className="border-border/50 shadow-sm">
-          <CardContent className="p-0">
-            {isLoading ? (
-              <div className="p-8 flex justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : (
-              <>
-                <TabsContent value="charges" className="mt-0">
-                  <ChargeTable data={charges} emptyMessage="Nenhuma cobrança encontrada." />
-                </TabsContent>
-                <TabsContent value="invoices" className="mt-0">
-                  <ChargeTable data={chargesWithInvoices} emptyMessage="Nenhuma nota fiscal encontrada." />
-                </TabsContent>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </Tabs>
+      <Card className="border-border/50 shadow-sm">
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-8 flex justify-center">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            <ChargeTable data={charges} emptyMessage="Nenhuma cobrança encontrada." />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
