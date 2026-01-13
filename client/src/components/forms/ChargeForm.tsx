@@ -32,7 +32,7 @@ export function ChargeForm() {
   
   const [boletoUploading, setBoletoUploading] = useState(false);
 
-  const form = useForm<InsertCharge>({
+  const form = useForm<InsertCharge & { recurringCount: number; intervalDays: number }>({
     resolver: zodResolver(insertChargeSchema),
     defaultValues: {
       title: "",
@@ -41,6 +41,8 @@ export function ChargeForm() {
       status: "pending",
       companyId: undefined,
       boletoFile: null,
+      recurringCount: 1,
+      intervalDays: 30,
     },
   });
 
@@ -58,7 +60,7 @@ export function ChargeForm() {
     }
   };
 
-  const onSubmit = (data: InsertCharge) => {
+  const onSubmit = (data: InsertCharge & { recurringCount: number; intervalDays: number }) => {
     createCharge.mutate(data, {
       onSuccess: () => {
         setOpen(false);
@@ -163,9 +165,49 @@ export function ChargeForm() {
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data de Vencimento</FormLabel>
+                    <FormLabel>Primeiro Vencimento</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="recurringCount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nº de Cobranças (até 12)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min={1} 
+                        max={12} 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="intervalDays"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Intervalo (Dias)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min={1} 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
