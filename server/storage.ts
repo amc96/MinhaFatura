@@ -86,7 +86,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCharge(charge: InsertCharge): Promise<Charge> {
-    const [newCharge] = await db.insert(charges).values(charge).returning();
+    const [newCharge] = await db.insert(charges).values(charge as any).returning();
     return newCharge;
   }
 

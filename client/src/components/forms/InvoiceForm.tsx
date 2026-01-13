@@ -53,7 +53,7 @@ export function InvoiceForm() {
 
   const onSubmit = (data: InsertInvoice) => {
     if (!data.chargeId || !data.fileUrl) return;
-    createInvoice.mutate(data, {
+    createInvoice.mutate(data as any, {
       onSuccess: () => {
         setOpen(false);
         form.reset();
