@@ -15,14 +15,14 @@ export function Sidebar() {
   const { user, logoutMutation } = useAuth();
 
   const adminLinks = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/companies", icon: Building2, label: "Companies" },
-    { href: "/admin/charges", icon: Receipt, label: "Charges" },
-    { href: "/admin/users", icon: Users, label: "Users" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Painel" },
+    { href: "/admin/companies", icon: Building2, label: "Empresas" },
+    { href: "/admin/charges", icon: Receipt, label: "Cobranças" },
+    { href: "/admin/users", icon: Users, label: "Usuários" },
   ];
 
   const companyLinks = [
-    { href: "/portal/charges", icon: Receipt, label: "My Charges" },
+    { href: "/portal/charges", icon: Receipt, label: "Minhas Cobranças" },
   ];
 
   const links = user?.role === "admin" ? adminLinks : companyLinks;
@@ -72,7 +72,7 @@ export function Sidebar() {
           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          Sign Out
+          Sair
         </button>
       </div>
     </div>

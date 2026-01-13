@@ -12,8 +12,8 @@ import { useEffect } from "react";
 import { ShieldCheck } from "lucide-react";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+  username: z.string().min(1, "O usuário é obrigatório"),
+  password: z.string().min(1, "A senha é obrigatória"),
 });
 
 export default function Login() {
@@ -46,10 +46,10 @@ export default function Login() {
             <ShieldCheck className="w-7 h-7" />
           </div>
           <CardTitle className="text-2xl font-bold font-display text-slate-900">
-            Welcome Back
+            Bem-vindo de volta
           </CardTitle>
           <CardDescription className="text-slate-500">
-            Enter your credentials to access the system
+            Insira suas credenciais para acessar o sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -60,7 +60,7 @@ export default function Login() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-700">Username</FormLabel>
+                    <FormLabel className="text-slate-700">Usuário</FormLabel>
                     <FormControl>
                       <Input placeholder="admin" className="h-11 bg-slate-50 border-slate-200" {...field} />
                     </FormControl>
@@ -73,7 +73,7 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-700">Password</FormLabel>
+                    <FormLabel className="text-slate-700">Senha</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" className="h-11 bg-slate-50 border-slate-200" {...field} />
                     </FormControl>
@@ -82,7 +82,7 @@ export default function Login() {
                 )}
               />
               <Button type="submit" className="w-full h-11 text-base btn-primary" disabled={loginMutation.isPending}>
-                {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                {loginMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
             </form>
           </Form>

@@ -30,43 +30,43 @@ export default function Dashboard() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-500 mt-2">Overview of financial performance and metrics.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Painel</h1>
+          <p className="text-slate-500 mt-2">Visão geral do desempenho financeiro e métricas.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Total Revenue"
+          title="Receita Total"
           value={`R$ ${totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
           icon={DollarSign}
           color="green"
         />
         <StatCard
-          title="Active Companies"
+          title="Empresas Ativas"
           value={companies?.length || 0}
           icon={Building2}
           color="blue"
         />
         <StatCard
-          title="Pending Amount"
+          title="Valor Pendente"
           value={`R$ ${pendingRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
           icon={Receipt}
           color="amber"
         />
         <StatCard
-          title="Overdue Charges"
+          title="Cobranças Atrasadas"
           value={overdueCount}
           icon={AlertCircle}
           color="red"
-          description="Requires immediate attention"
+          description="Requer atenção imediata"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <Card className="col-span-2 border-border/50 shadow-sm">
           <CardHeader>
-            <CardTitle>Revenue Overview</CardTitle>
+            <CardTitle>Visão Geral da Receita</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
@@ -88,7 +88,7 @@ export default function Dashboard() {
 
         <Card className="col-span-1 border-border/50 shadow-sm">
           <CardHeader>
-            <CardTitle>Recent Companies</CardTitle>
+            <CardTitle>Empresas Recentes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -104,7 +104,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {(!companies || companies.length === 0) && (
-                <p className="text-sm text-slate-500 text-center py-4">No companies registered yet.</p>
+                <p className="text-sm text-slate-500 text-center py-4">Nenhuma empresa cadastrada ainda.</p>
               )}
             </div>
           </CardContent>
