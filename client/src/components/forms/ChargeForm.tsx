@@ -31,7 +31,6 @@ export function ChargeForm() {
   const uploadFile = useUploadFile();
   
   const [boletoUploading, setBoletoUploading] = useState(false);
-  const [invoiceUploading, setInvoiceUploading] = useState(false);
 
   const form = useForm<InsertCharge>({
     resolver: zodResolver(insertChargeSchema),
@@ -48,7 +47,7 @@ export function ChargeForm() {
 
   const handleFileUpload = async (
     file: File, 
-    field: "boletoFile" | "invoiceFile",
+    field: "boletoFile",
     setLoading: (l: boolean) => void
   ) => {
     setLoading(true);
@@ -175,44 +174,8 @@ export function ChargeForm() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <FormItem>
-                <FormLabel>Boleto (PDF/Imagem)</FormLabel>
-                <div className="flex items-center gap-2">
-                  <Input 
-                    type="file" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, "boletoFile", setBoletoUploading);
-                    }}
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    className="cursor-pointer"
-                  />
-                  {boletoUploading && <Upload className="w-4 h-4 animate-bounce text-primary" />}
-                </div>
-                {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
-              </FormItem>
-
-              <FormItem>
-                <FormLabel>Nota Fiscal (NF-e)</FormLabel>
-                <div className="flex items-center gap-2">
-                  <Input 
-                    type="file" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, "invoiceFile", setInvoiceUploading);
-                    }}
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    className="cursor-pointer"
-                  />
-                  {invoiceUploading && <Upload className="w-4 h-4 animate-bounce text-primary" />}
-                </div>
-                {form.watch("invoiceFile") && <p className="text-xs text-green-600 flex items-center gap-1"><FileText className="w-3 h-3"/> Carregado</p>}
-              </FormItem>
-            </div>
-
             <div className="flex justify-end pt-4">
-              <Button type="submit" disabled={createCharge.isPending || boletoUploading || invoiceUploading}>
+              <Button type="submit" disabled={createCharge.isPending || boletoUploading}>
                 {createCharge.isPending ? "Salvando..." : "Criar Cobrança"}
               </Button>
             </div>

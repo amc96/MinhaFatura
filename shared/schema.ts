@@ -29,9 +29,16 @@ export const charges = pgTable("charges", {
   dueDate: date("due_date").notNull(),
   status: text("status", { enum: ["pending", "paid", "overdue"] }).default("pending").notNull(),
   boletoFile: text("boleto_file"),
-  invoiceFile: text("invoice_file"),
   paymentMethod: text("payment_method"),
   paymentDate: date("payment_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  chargeId: integer("charge_id").notNull(),
+  companyId: integer("company_id").notNull(),
+  fileUrl: text("file_url").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -45,11 +52,24 @@ export const usersRelations = relations(users, ({ one }) => ({
 export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
   charges: many(charges),
+  invoices: many(invoices),
 }));
 
-export const chargesRelations = relations(charges, ({ one }) => ({
+export const chargesRelations = relations(charges, ({ one, many }) => ({
   company: one(companies, {
     fields: [charges.companyId],
+    references: [companies.id],
+  }),
+  invoices: many(invoices),
+}));
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  charge: one(charges, {
+    fields: [invoices.chargeId],
+    references: [charges.id],
+  }),
+  company: one(companies, {
+    fields: [invoices.companyId],
     references: [companies.id],
   }),
 }));
@@ -59,6 +79,7 @@ export const insertCompanySchema = createInsertSchema(companies).omit({ id: true
 export const insertChargeSchema = createInsertSchema(charges).omit({ id: true, createdAt: true }).extend({
   amount: z.coerce.number(),
 });
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, createdAt: true });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -66,3 +87,5 @@ export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Charge = typeof charges.$inferSelect;
 export type InsertCharge = z.infer<typeof insertChargeSchema>;
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
