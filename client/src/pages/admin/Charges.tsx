@@ -36,14 +36,15 @@ export default function Charges() {
             </div>
           ) : (
             <Table>
-              <TableHeader>
+                  <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                   <TableHead>Título</TableHead>
                   <TableHead>Empresa</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Vencimento</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Anexos</TableHead>
+                  <TableHead>Anexos</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -56,8 +57,8 @@ export default function Charges() {
                     <TableCell>
                       <StatusBadge status={charge.status} />
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <TableCell>
+                      <div className="flex items-center gap-2">
                         {charge.boletoFile && (
                           <Button 
                             variant="ghost" 
@@ -80,10 +81,12 @@ export default function Charges() {
                             <FileText className="w-4 h-4" />
                           </Button>
                         )}
-                        {charge.status !== 'paid' && (
-                          <PaymentForm chargeId={charge.id} chargeTitle={charge.title} />
-                        )}
                       </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {charge.status !== 'paid' && (
+                        <PaymentForm chargeId={charge.id} chargeTitle={charge.title} />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
