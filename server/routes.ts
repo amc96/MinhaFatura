@@ -117,11 +117,29 @@ export async function registerRoutes(
     if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
     try {
       const input = api.charges.create.input.parse(req.body);
-      const charge = await storage.createCharge(input);
-      res.status(201).json(charge);
+      const { recurringCount = 1, intervalDays = 30, ...chargeData } = input as any;
+      
+      const createdCharges = [];
+      const startDate = new Date(chargeData.dueDate);
+
+      for (let i = 0; i < recurringCount; i++) {
+        const dueDate = new Date(startDate);
+        dueDate.setDate(startDate.getDate() + (i * intervalDays));
+        
+        const charge = await storage.createCharge({
+          ...chargeData,
+          dueDate: dueDate.toISOString().split('T')[0],
+          title: recurringCount > 1 ? `${chargeData.title} (${i + 1}/${recurringCount})` : chargeData.title,
+        });
+        createdCharges.push(charge);
+      }
+
+      res.status(201).json(recurringCount === 1 ? createdCharges[0] : createdCharges);
     } catch (err) {
       if (err instanceof z.ZodError) {
         res.status(400).json({ message: "Dados inválidos", errors: err.errors });
+      } else {
+        res.status(500).json({ message: "Erro ao criar cobrança(s)" });
       }
     }
   });

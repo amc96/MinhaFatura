@@ -78,6 +78,8 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertChargeSchema = createInsertSchema(charges).omit({ id: true, createdAt: true }).extend({
   amount: z.coerce.number(),
+  recurringCount: z.number().min(1).max(12).optional().default(1),
+  intervalDays: z.number().min(1).optional().default(30),
 });
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, createdAt: true });
 
