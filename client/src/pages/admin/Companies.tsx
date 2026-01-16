@@ -37,8 +37,8 @@ export default function Companies() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                  <TableHead className="w-[300px]">Nome da Empresa</TableHead>
-                  <TableHead>Documento</TableHead>
+                  <TableHead className="w-[250px]">Nome da Empresa</TableHead>
+                  <TableHead>Documento / IE</TableHead>
                   <TableHead>Contato</TableHead>
                   <TableHead>Endereço</TableHead>
                   <TableHead>Cadastrada em</TableHead>
@@ -56,11 +56,25 @@ export default function Companies() {
                         <span className="font-medium text-slate-900">{company.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">{company.document}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2 text-slate-500">
-                        <Mail className="w-3 h-3" />
-                        {company.email}
+                      <div className="flex flex-col">
+                        <span className="font-mono text-xs">{company.document}</span>
+                        {company.stateRegistration && (
+                          <span className="text-[10px] text-slate-500">IE: {company.stateRegistration}</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1 text-slate-500">
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-3 h-3" />
+                          <span className="text-xs">{company.email}</span>
+                        </div>
+                        {company.whatsapp && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded-full font-medium">Whats: {company.whatsapp}</span>
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>

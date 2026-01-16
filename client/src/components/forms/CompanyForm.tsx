@@ -33,6 +33,8 @@ export function CompanyForm({ company }: CompanyFormProps) {
       document: company?.document || "",
       email: company?.email || "",
       address: company?.address || "",
+      stateRegistration: company?.stateRegistration || "",
+      whatsapp: company?.whatsapp || "",
     },
   });
 
@@ -43,6 +45,8 @@ export function CompanyForm({ company }: CompanyFormProps) {
         document: company.document,
         email: company.email,
         address: company.address,
+        stateRegistration: company.stateRegistration || "",
+        whatsapp: company.whatsapp || "",
       });
     }
   }, [company, open, form]);
@@ -59,6 +63,8 @@ export function CompanyForm({ company }: CompanyFormProps) {
         form.setValue("name", data.name);
         form.setValue("email", data.email);
         form.setValue("address", data.address);
+        form.setValue("stateRegistration", data.stateRegistration);
+        form.setValue("whatsapp", data.whatsapp);
       }
     } finally {
       setLoadingCnpj(false);
@@ -145,6 +151,34 @@ export function CompanyForm({ company }: CompanyFormProps) {
                 </FormItem>
               )}
             />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="stateRegistration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Inscrição Estadual</FormLabel>
+                    <FormControl>
+                      <Input placeholder="000.000.000.000" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="whatsapp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>WhatsApp / Contato</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(00) 00000-0000" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="email"

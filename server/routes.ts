@@ -94,8 +94,10 @@ export async function registerRoutes(
         name: data.razao_social,
         email: data.email || "",
         phone: data.ddd_telefone_1 || "",
+        whatsapp: data.ddd_telefone_1 || "",
         address: `${data.logradouro}, ${data.numero}${data.complemento ? ' - ' : ''}${data.complemento} - ${data.bairro}, ${data.municipio}/${data.uf}`,
-        cnpj: data.cnpj
+        cnpj: data.cnpj,
+        stateRegistration: data.inscricao_estadual || ""
       });
     } catch (err) {
       res.status(500).json({ message: "Erro ao buscar dados do CNPJ" });

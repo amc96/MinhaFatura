@@ -18,6 +18,8 @@ export const companies = pgTable("companies", {
   document: text("document").notNull(), // CNPJ/CPF
   email: text("email").notNull(),
   address: text("address"),
+  stateRegistration: text("state_registration"),
+  whatsapp: text("whatsapp"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
