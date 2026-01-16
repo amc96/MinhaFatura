@@ -7,7 +7,6 @@ export function useCharges(companyId?: number) {
   return useQuery({
     queryKey: [api.charges.list.path, companyId],
     queryFn: async () => {
-      // Build URL with query params if companyId exists
       const url = new URL(api.charges.list.path, window.location.origin);
       if (companyId) {
         url.searchParams.append("companyId", companyId.toString());
@@ -42,16 +41,59 @@ export function useCreateCharge() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.charges.list.path] });
       toast({
-        title: "Success",
-        description: "Charge created successfully",
+        title: "Sucesso",
+        description: "Cobrança criada com sucesso",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Erro",
         description: error.message,
         variant: "destructive",
       });
+    },
+  });
+}
+
+export function useUpdateCharge() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertCharge> }) => {
+      const res = await fetch(`/api/charges/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to update charge");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.charges.list.path] });
+      toast({ title: "Sucesso", description: "Cobrança atualizada com sucesso" });
+    },
+  });
+}
+
+export function useDeleteCharge() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/charges/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete charge");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.charges.list.path] });
+      toast({ title: "Sucesso", description: "Cobrança excluída com sucesso" });
     },
   });
 }
@@ -77,7 +119,7 @@ export function useUploadFile() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Upload Error",
+        title: "Erro no Upload",
         description: error.message,
         variant: "destructive",
       });

@@ -50,16 +50,59 @@ export function useCreateCompany() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.companies.list.path] });
       toast({
-        title: "Success",
-        description: "Company registered successfully",
+        title: "Sucesso",
+        description: "Empresa cadastrada com sucesso",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Erro",
         description: error.message,
         variant: "destructive",
       });
+    },
+  });
+}
+
+export function useUpdateCompany() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertCompany> }) => {
+      const res = await fetch(`/api/companies/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to update company");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.companies.list.path] });
+      toast({ title: "Sucesso", description: "Empresa atualizada com sucesso" });
+    },
+  });
+}
+
+export function useDeleteCompany() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/companies/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete company");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.companies.list.path] });
+      toast({ title: "Sucesso", description: "Empresa excluída com sucesso" });
     },
   });
 }

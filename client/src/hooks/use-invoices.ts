@@ -55,6 +55,26 @@ export function useCreateInvoice() {
   });
 }
 
+export function useDeleteInvoice() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/invoices/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete invoice");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.invoices.list.path] });
+      toast({ title: "Sucesso", description: "Nota fiscal excluída com sucesso" });
+    },
+  });
+}
+
 export function useUploadFile() {
   const { toast } = useToast();
 
