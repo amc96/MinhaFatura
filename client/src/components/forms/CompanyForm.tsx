@@ -42,7 +42,6 @@ export function CompanyForm({ company }: CompanyFormProps) {
       address: company?.address || "",
       stateRegistration: company?.stateRegistration || "",
       whatsapp: company?.whatsapp || "",
-      contractType: company?.contractType || "service",
     },
   });
 
@@ -55,7 +54,6 @@ export function CompanyForm({ company }: CompanyFormProps) {
         address: company.address,
         stateRegistration: company.stateRegistration || "",
         whatsapp: company.whatsapp || "",
-        contractType: company.contractType,
       });
     }
   }, [company, open, form]);
@@ -210,27 +208,6 @@ export function CompanyForm({ company }: CompanyFormProps) {
                   <FormControl>
                     <Input placeholder="Rua Business, 123" value={field.value || ''} onChange={field.onChange} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="contractType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Contrato</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de contrato" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="service">Prestação de Serviço</SelectItem>
-                      <SelectItem value="equipment_lease">Locação de Equipamentos</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

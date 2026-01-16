@@ -38,7 +38,6 @@ export default function Companies() {
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                   <TableHead className="w-[250px]">Nome da Empresa</TableHead>
-                  <TableHead>Contrato</TableHead>
                   <TableHead>Documento / IE</TableHead>
                   <TableHead>Contato</TableHead>
                   <TableHead>Endereço</TableHead>
@@ -55,14 +54,6 @@ export default function Companies() {
                           <Building className="w-4 h-4" />
                         </div>
                         <span className="font-medium text-slate-900">{company.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm">
-                          {company.contractType === 'service' ? 'Serviço' : 'Locação'}
-                        </span>
                       </div>
                     </TableCell>
                     <TableCell>

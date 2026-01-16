@@ -293,5 +293,40 @@ export async function registerRoutes(
     res.json({ url });
   });
 
+  // === CONTRACTS ===
+  app.get('/api/contracts', async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    let companyId = req.query.companyId ? Number(req.query.companyId) : undefined;
+    if (req.user!.role === 'company') {
+      companyId = req.user!.companyId!;
+    }
+
+    const contracts = await storage.getContracts(companyId);
+    res.json(contracts);
+  });
+
+  app.post('/api/contracts', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const contract = await storage.createContract(req.body);
+      res.status(201).json(contract);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao criar contrato" });
+    }
+  });
+
+  app.delete('/api/contracts/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteContract(id);
+      if (!success) return res.status(404).json({ message: "Contrato não encontrado" });
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao excluir contrato" });
+    }
+  });
+
   return httpServer;
 }

@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, companies, charges, invoices, type User, type InsertUser, type Company, type InsertCompany, type Charge, type InsertCharge, type Invoice, type InsertInvoice } from "@shared/schema";
+import { users, companies, charges, invoices, contracts, type User, type InsertUser, type Company, type InsertCompany, type Charge, type InsertCharge, type Invoice, type InsertInvoice, type Contract, type InsertContract } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
@@ -14,6 +14,11 @@ export interface IStorage {
   createCompany(company: InsertCompany): Promise<Company>;
   updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
   deleteCompany(id: number): Promise<boolean>;
+
+  // Contracts
+  getContracts(companyId?: number): Promise<(Contract & { company: Company })[]>;
+  createContract(contract: InsertContract): Promise<Contract>;
+  deleteContract(id: number): Promise<boolean>;
 
   // Charges
   getCharges(companyId?: number): Promise<(Charge & { company: Company })[]>;
@@ -178,6 +183,38 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInvoice(id: number): Promise<boolean> {
     const [deleted] = await db.delete(invoices).where(eq(invoices.id, id)).returning();
+    return !!deleted;
+  }
+
+  async getContracts(companyId?: number): Promise<(Contract & { company: Company })[]> {
+    const query = db.select({
+        id: contracts.id,
+        companyId: contracts.companyId,
+        type: contracts.type,
+        duration: contracts.duration,
+        fileUrl: contracts.fileUrl,
+        createdAt: contracts.createdAt,
+        company: companies
+      })
+      .from(contracts)
+      .innerJoin(companies, eq(contracts.companyId, companies.id))
+      .orderBy(desc(contracts.createdAt));
+
+    if (companyId) {
+      query.where(eq(contracts.companyId, companyId));
+    }
+
+    // @ts-ignore
+    return await query;
+  }
+
+  async createContract(contract: InsertContract): Promise<Contract> {
+    const [newContract] = await db.insert(contracts).values(contract as any).returning();
+    return newContract;
+  }
+
+  async deleteContract(id: number): Promise<boolean> {
+    const [deleted] = await db.delete(contracts).where(eq(contracts.id, id)).returning();
     return !!deleted;
   }
 }

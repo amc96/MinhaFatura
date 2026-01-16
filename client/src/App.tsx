@@ -12,6 +12,7 @@ import Companies from "@/pages/admin/Companies";
 import Charges from "@/pages/admin/Charges";
 import AdminInvoices from "@/pages/admin/Invoices";
 import Users from "@/pages/admin/Users";
+import Contracts from "@/pages/admin/Contracts";
 import MyCharges from "@/pages/company/MyCharges";
 import MyInvoices from "@/pages/company/MyInvoices";
 import NotFound from "@/pages/NotFound";
@@ -49,6 +50,9 @@ function Router() {
       </Route>
       <Route path="/admin/users">
         <Layout><Users /></Layout>
+      </Route>
+      <Route path="/admin/contracts">
+        <Layout><Contracts /></Layout>
       </Route>
       <Route path="/portal/charges">
         <Layout><MyCharges /></Layout>

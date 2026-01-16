@@ -20,6 +20,7 @@ export function Sidebar() {
     { href: "/admin/companies", icon: Building2, label: "Empresas" },
     { href: "/admin/charges", icon: Receipt, label: "Cobranças" },
     { href: "/admin/invoices", icon: FileText, label: "Notas Fiscais" },
+    { href: "/admin/contracts", icon: FileText, label: "Contratos" },
     { href: "/admin/users", icon: Users, label: "Usuários" },
   ];
 

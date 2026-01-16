@@ -21,7 +21,15 @@ export const companies = pgTable("companies", {
   address: text("address"),
   stateRegistration: text("state_registration"),
   whatsapp: text("whatsapp"),
-  contractType: text("contract_type", { enum: ["service", "equipment_lease"] }).default("service").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const contracts = pgTable("contracts", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull(),
+  type: text("type", { enum: ["service", "equipment_lease"] }).notNull(),
+  duration: text("duration").notNull(),
+  fileUrl: text("file_url"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -57,6 +65,14 @@ export const companiesRelations = relations(companies, ({ many }) => ({
   users: many(users),
   charges: many(charges),
   invoices: many(invoices),
+  contracts: many(contracts),
+}));
+
+export const contractsRelations = relations(contracts, ({ one }) => ({
+  company: one(companies, {
+    fields: [contracts.companyId],
+    references: [companies.id],
+  }),
 }));
 
 export const chargesRelations = relations(charges, ({ one, many }) => ({
@@ -79,20 +95,21 @@ export const invoicesRelations = relations(invoices, ({ one }) => ({
 }));
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
-export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true }).extend({
-  contractType: z.enum(["service", "equipment_lease"]),
-});
+export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertChargeSchema = createInsertSchema(charges).omit({ id: true, createdAt: true }).extend({
   amount: z.coerce.number(),
   recurringCount: z.number().min(1).max(12).optional().default(1),
   intervalDays: z.number().min(1).optional().default(30),
 });
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, createdAt: true });
+export const insertContractSchema = createInsertSchema(contracts).omit({ id: true, createdAt: true });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
+export type Contract = typeof contracts.$inferSelect;
+export type InsertContract = z.infer<typeof insertContractSchema>;
 export type Charge = typeof charges.$inferSelect;
 export type InsertCharge = z.infer<typeof insertChargeSchema>;
 export type Invoice = typeof invoices.$inferSelect;
