@@ -21,6 +21,7 @@ export const companies = pgTable("companies", {
   address: text("address"),
   stateRegistration: text("state_registration"),
   whatsapp: text("whatsapp"),
+  contractType: text("contract_type", { enum: ["service", "equipment_lease"] }).default("service").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
