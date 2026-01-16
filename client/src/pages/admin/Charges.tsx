@@ -1,4 +1,4 @@
-import { useCharges } from "@/hooks/use-charges";
+import { useCharges, useDeleteCharge } from "@/hooks/use-charges";
 import { ChargeForm } from "@/components/forms/ChargeForm";
 import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,11 +12,12 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download, FileText } from "lucide-react";
+import { Loader2, Download, FileText, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Charges() {
   const { data: charges, isLoading } = useCharges();
+  const deleteCharge = useDeleteCharge();
 
   const ChargeTable = ({ data, emptyMessage }: { data: any, emptyMessage: string }) => (
     <Table>
@@ -32,7 +33,7 @@ export default function Charges() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data?.map((charge) => (
+        {data?.map((charge: any) => (
           <TableRow key={charge.id} className="table-row-hover">
             <TableCell className="font-medium">{charge.title}</TableCell>
             <TableCell>{charge.company.name}</TableCell>
@@ -68,9 +69,23 @@ export default function Charges() {
               </div>
             </TableCell>
             <TableCell className="text-right">
-              {charge.status !== 'paid' && (
-                <PaymentForm chargeId={charge.id} chargeTitle={charge.title} />
-              )}
+              <div className="flex items-center justify-end gap-2">
+                {charge.status !== 'paid' && (
+                  <PaymentForm chargeId={charge.id} chargeTitle={charge.title} />
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="text-slate-500 hover:text-destructive"
+                  onClick={() => {
+                    if (confirm("Tem certeza que deseja excluir esta cobrança?")) {
+                      deleteCharge.mutate(charge.id);
+                    }
+                  }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}

@@ -1,4 +1,4 @@
-import { useInvoices } from "@/hooks/use-invoices";
+import { useInvoices, useDeleteInvoice } from "@/hooks/use-invoices";
 import { InvoiceForm } from "@/components/forms/InvoiceForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -10,11 +10,12 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, ExternalLink } from "lucide-react";
+import { Loader2, FileText, ExternalLink, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function AdminInvoices() {
   const { data: invoices, isLoading } = useInvoices();
+  const deleteInvoice = useDeleteInvoice();
 
   if (isLoading) {
     return (
@@ -52,16 +53,30 @@ export default function AdminInvoices() {
                   <TableCell>{invoice.charge.title}</TableCell>
                   <TableCell>{format(new Date(invoice.createdAt!), 'dd/MM/yyyy HH:mm')}</TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => window.open(invoice.fileUrl, '_blank')}
-                    >
-                      <FileText className="w-4 h-4" />
-                      Visualizar
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-2"
+                        onClick={() => window.open(invoice.fileUrl, '_blank')}
+                      >
+                        <FileText className="w-4 h-4" />
+                        Visualizar
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="text-slate-500 hover:text-destructive"
+                        onClick={() => {
+                          if (confirm("Tem certeza que deseja excluir esta nota fiscal?")) {
+                            deleteInvoice.mutate(invoice.id);
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

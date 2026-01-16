@@ -1,6 +1,7 @@
-import { useCompanies } from "@/hooks/use-companies";
+import { useCompanies, useDeleteCompany } from "@/hooks/use-companies";
 import { CompanyForm } from "@/components/forms/CompanyForm";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   Table, 
   TableBody, 
@@ -9,11 +10,12 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Loader2, Mail, MapPin, Building } from "lucide-react";
+import { Loader2, Mail, MapPin, Building, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Companies() {
   const { data: companies, isLoading } = useCompanies();
+  const deleteCompany = useDeleteCompany();
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -40,6 +42,7 @@ export default function Companies() {
                   <TableHead>Contato</TableHead>
                   <TableHead>Endereço</TableHead>
                   <TableHead>Cadastrada em</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -71,11 +74,27 @@ export default function Companies() {
                     <TableCell className="text-slate-500 text-xs">
                       {company.createdAt && format(new Date(company.createdAt), 'MMM dd, yyyy')}
                     </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="text-slate-500 hover:text-destructive"
+                          onClick={() => {
+                            if (confirm("Tem certeza que deseja excluir esta empresa? Isso excluirá todas as cobranças e notas fiscais relacionadas.")) {
+                              deleteCompany.mutate(company.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
                 {companies?.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                    <TableCell colSpan={6} className="text-center py-8 text-slate-500">
                       Nenhuma empresa encontrada. Crie uma para começar.
                     </TableCell>
                   </TableRow>

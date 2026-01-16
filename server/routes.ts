@@ -121,7 +121,67 @@ export async function registerRoutes(
     }
   });
 
+  app.patch('/api/companies/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const company = await storage.updateCompany(id, req.body);
+      if (!company) return res.status(404).json({ message: "Empresa não encontrada" });
+      res.json(company);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao atualizar empresa" });
+    }
+  });
+
+  app.delete('/api/companies/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteCompany(id);
+      if (!success) return res.status(404).json({ message: "Empresa não encontrada" });
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao excluir empresa" });
+    }
+  });
+
   // === CHARGES ===
+  app.patch('/api/charges/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const charge = await storage.updateCharge(id, req.body);
+      if (!charge) return res.status(404).json({ message: "Cobrança não encontrada" });
+      res.json(charge);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao atualizar cobrança" });
+    }
+  });
+
+  app.delete('/api/charges/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteCharge(id);
+      if (!success) return res.status(404).json({ message: "Cobrança não encontrada" });
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao excluir cobrança" });
+    }
+  });
+
+  // === INVOICES ===
+  app.delete('/api/invoices/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteInvoice(id);
+      if (!success) return res.status(404).json({ message: "Nota fiscal não encontrada" });
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao excluir nota fiscal" });
+    }
+  });
   app.get(api.charges.list.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     
