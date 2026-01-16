@@ -81,6 +81,27 @@ export async function registerRoutes(
   }
 
   // === COMPANIES ===
+  app.get('/api/cnpj/:cnpj', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    const cnpj = req.params.cnpj.replace(/\D/g, '');
+    if (cnpj.length !== 14) return res.status(400).json({ message: "CNPJ inválido" });
+    
+    try {
+      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+      if (!response.ok) throw new Error('Falha ao buscar CNPJ');
+      const data = await response.json() as any;
+      res.json({
+        name: data.razao_social,
+        email: data.email || "",
+        phone: data.ddd_telefone_1 || "",
+        address: `${data.logradouro}, ${data.numero}${data.complemento ? ' - ' : ''}${data.complemento} - ${data.bairro}, ${data.municipio}/${data.uf}`,
+        cnpj: data.cnpj
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao buscar dados do CNPJ" });
+    }
+  });
+
   app.get(api.companies.list.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const companies = await storage.getCompanies();

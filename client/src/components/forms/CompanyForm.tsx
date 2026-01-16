@@ -18,6 +18,7 @@ import { useState } from "react";
 
 export function CompanyForm() {
   const [open, setOpen] = useState(false);
+  const [loadingCnpj, setLoadingCnpj] = useState(false);
   const createCompany = useCreateCompany();
 
   const form = useForm<InsertCompany>({
@@ -29,6 +30,24 @@ export function CompanyForm() {
       address: "",
     },
   });
+
+  const fetchCnpjData = async (cnpj: string) => {
+    const cleanCnpj = cnpj.replace(/\D/g, '');
+    if (cleanCnpj.length !== 14) return;
+
+    setLoadingCnpj(true);
+    try {
+      const response = await fetch(`/api/cnpj/${cleanCnpj}`);
+      if (response.ok) {
+        const data = await response.json();
+        form.setValue("name", data.name);
+        form.setValue("email", data.email);
+        form.setValue("address", data.address);
+      }
+    } finally {
+      setLoadingCnpj(false);
+    }
+  };
 
   const onSubmit = (data: InsertCompany) => {
     createCompany.mutate(data, {
@@ -73,7 +92,23 @@ export function CompanyForm() {
                 <FormItem>
                   <FormLabel>Documento (CNPJ/CPF)</FormLabel>
                   <FormControl>
-                    <Input placeholder="00.000.000/0000-00" {...field} />
+                    <div className="relative">
+                      <Input 
+                        placeholder="00.000.000/0000-00" 
+                        {...field} 
+                        onChange={(e) => {
+                          field.onChange(e);
+                          if (e.target.value.replace(/\D/g, '').length === 14) {
+                            fetchCnpjData(e.target.value);
+                          }
+                        }}
+                      />
+                      {loadingCnpj && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                        </div>
+                      )}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
