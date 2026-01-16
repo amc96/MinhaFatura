@@ -70,6 +70,7 @@ export default function Charges() {
             </TableCell>
             <TableCell className="text-right">
               <div className="flex items-center justify-end gap-2">
+                <ChargeForm charge={charge} />
                 {charge.status !== 'paid' && (
                   <PaymentForm chargeId={charge.id} chargeTitle={charge.title} />
                 )}

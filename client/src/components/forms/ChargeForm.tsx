@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertChargeSchema, type InsertCharge } from "@shared/schema";
-import { useCreateCharge, useUploadFile } from "@/hooks/use-charges";
+import { insertChargeSchema, type InsertCharge, Charge } from "@shared/schema";
+import { useCreateCharge, useUpdateCharge, useUploadFile } from "@/hooks/use-charges";
 import { useCompanies } from "@/hooks/use-companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,13 +21,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Upload, FileText } from "lucide-react";
-import { useState } from "react";
+import { Plus, Upload, FileText, Edit2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
-export function ChargeForm() {
+interface ChargeFormProps {
+  charge?: Charge;
+}
+
+export function ChargeForm({ charge }: ChargeFormProps) {
   const [open, setOpen] = useState(false);
   const { data: companies } = useCompanies();
   const createCharge = useCreateCharge();
+  const updateCharge = useUpdateCharge();
   const uploadFile = useUploadFile();
   
   const [boletoUploading, setBoletoUploading] = useState<Record<number, boolean>>({});
@@ -35,17 +40,33 @@ export function ChargeForm() {
   const form = useForm<InsertCharge & { recurringCount: number; intervalDays: number; installments: { dueDate: string; boletoFile: string | null }[] }>({
     resolver: zodResolver(insertChargeSchema),
     defaultValues: {
-      title: "",
-      amount: 0,
-      dueDate: new Date().toISOString().split('T')[0],
-      status: "pending",
-      companyId: undefined,
-      boletoFile: null,
+      title: charge?.title || "",
+      amount: charge ? Number(charge.amount) : 0,
+      dueDate: charge?.dueDate || new Date().toISOString().split('T')[0],
+      status: (charge?.status as any) || "pending",
+      companyId: charge?.companyId || undefined,
+      boletoFile: charge?.boletoFile || null,
       recurringCount: 1,
       intervalDays: 30,
       installments: [],
     },
   });
+
+  useEffect(() => {
+    if (charge && open) {
+      form.reset({
+        title: charge.title,
+        amount: Number(charge.amount),
+        dueDate: charge.dueDate,
+        status: charge.status as any,
+        companyId: charge.companyId,
+        boletoFile: charge.boletoFile,
+        recurringCount: 1,
+        intervalDays: 30,
+        installments: [],
+      });
+    }
+  }, [charge, open, form]);
 
   const recurringCount = form.watch("recurringCount");
   const intervalDays = form.watch("intervalDays");
@@ -75,36 +96,52 @@ export function ChargeForm() {
     try {
       const { url } = await uploadFile.mutateAsync(file);
       const current = form.getValues("installments");
-      current[index].boletoFile = url;
-      form.setValue("installments", [...current]);
+      if (current && current[index]) {
+        current[index].boletoFile = url;
+        form.setValue("installments", [...current]);
+      } else {
+        form.setValue("boletoFile", url);
+      }
     } finally {
       setBoletoUploading(prev => ({ ...prev, [index]: false }));
     }
   };
 
-  const onSubmit = (data: InsertCharge & { recurringCount: number; intervalDays: number; installments: { dueDate: string; boletoFile: string | null }[] }) => {
-    // If multiple installments, we send them to the backend which handles bulk creation
-    // The backend route was already updated to handle recurringCount, but we might want to pass the specific files now.
-    // Let's adjust the backend to accept an array of installments if provided.
-    createCharge.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-        form.reset();
-      },
-    });
+  const onSubmit = (data: any) => {
+    if (charge) {
+      updateCharge.mutate({ id: charge.id, data }, {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      });
+    } else {
+      createCharge.mutate(data, {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="btn-primary gap-2">
-          <Plus className="w-4 h-4" />
-          Nova Cobrança
-        </Button>
+        {charge ? (
+          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-primary">
+            <Edit2 className="w-4 h-4" />
+          </Button>
+        ) : (
+          <Button className="btn-primary gap-2">
+            <Plus className="w-4 h-4" />
+            Nova Cobrança
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] overflow-y-auto max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Criar Nova Cobrança</DialogTitle>
+          <DialogTitle>{charge ? "Editar Cobrança" : "Criar Nova Cobrança"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
@@ -190,7 +227,7 @@ export function ChargeForm() {
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Primeiro Vencimento</FormLabel>
+                    <FormLabel>{charge ? "Data de Vencimento" : "Primeiro Vencimento"}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -200,81 +237,85 @@ export function ChargeForm() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="recurringCount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nº de Cobranças (até 12)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min={1} 
-                        max={12} 
-                        {...field} 
-                        onChange={(e) => {
-                          field.onChange(Number(e.target.value));
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="intervalDays"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Intervalo (Dias)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min={1} 
-                        {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {!charge && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="recurringCount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nº de Cobranças (até 12)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min={1} 
+                            max={12} 
+                            {...field} 
+                            onChange={(e) => {
+                              field.onChange(Number(e.target.value));
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="intervalDays"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Intervalo (Dias)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min={1} 
+                            {...field} 
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            {recurringCount > 1 && (
-              <div className="space-y-4 border rounded-md p-4 bg-slate-50 dark:bg-slate-900">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium">Simulação de Parcelas</h4>
-                  <Button type="button" variant="outline" size="sm" onClick={simulateInstallments}>
-                    Gerar Simulação
-                  </Button>
-                </div>
-                
-                <div className="space-y-3">
-                  {form.watch("installments").map((inst, idx) => (
-                    <div key={idx} className="flex items-center gap-4 text-xs p-2 border-b last:border-0">
-                      <span className="font-bold w-6">{idx + 1}º</span>
-                      <span className="flex-1">{inst.dueDate}</span>
-                      <div className="flex items-center gap-2">
-                        <Input 
-                          type="file" 
-                          className="h-8 w-40 text-[10px]"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload(file, idx);
-                          }}
-                        />
-                        {boletoUploading[idx] && <Upload className="w-3 h-3 animate-bounce" />}
-                        {inst.boletoFile && <FileText className="w-3 h-3 text-green-500" />}
-                      </div>
+                {recurringCount > 1 && (
+                  <div className="space-y-4 border rounded-md p-4 bg-slate-50 dark:bg-slate-900">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium">Simulação de Parcelas</h4>
+                      <Button type="button" variant="outline" size="sm" onClick={simulateInstallments}>
+                        Gerar Simulação
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              </div>
+                    
+                    <div className="space-y-3">
+                      {form.watch("installments")?.map((inst, idx) => (
+                        <div key={idx} className="flex items-center gap-4 text-xs p-2 border-b last:border-0">
+                          <span className="font-bold w-6">{idx + 1}º</span>
+                          <span className="flex-1">{inst.dueDate}</span>
+                          <div className="flex items-center gap-2">
+                            <Input 
+                              type="file" 
+                              className="h-8 w-40 text-[10px]"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(file, idx);
+                              }}
+                            />
+                            {boletoUploading[idx] && <Upload className="w-3 h-3 animate-bounce" />}
+                            {inst.boletoFile && <FileText className="w-3 h-3 text-green-500" />}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
-            {recurringCount === 1 && (
+            {(recurringCount === 1 || charge) && (
               <div className="grid grid-cols-1 gap-4 pt-2">
                 <FormItem>
                   <FormLabel>Boleto (PDF/Imagem)</FormLabel>
@@ -295,13 +336,14 @@ export function ChargeForm() {
                       className="cursor-pointer"
                     />
                   </div>
+                  {form.watch("boletoFile") && <p className="text-xs text-green-600 flex items-center gap-1 mt-1"><FileText className="w-3 h-3"/> Arquivo selecionado</p>}
                 </FormItem>
               </div>
             )}
 
             <div className="flex justify-end pt-4">
-              <Button type="submit" disabled={createCharge.isPending || Object.values(boletoUploading).some(Boolean)}>
-                {createCharge.isPending ? "Salvando..." : recurringCount > 1 ? "Simular e Gerar Parcelas" : "Criar Cobrança"}
+              <Button type="submit" disabled={createCharge.isPending || updateCharge.isPending || Object.values(boletoUploading).some(Boolean)}>
+                {charge ? (updateCharge.isPending ? "Salvando..." : "Salvar Alterações") : (createCharge.isPending ? "Salvando..." : recurringCount > 1 ? "Simular e Gerar Parcelas" : "Criar Cobrança")}
               </Button>
             </div>
           </form>

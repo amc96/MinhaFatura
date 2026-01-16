@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertCompanySchema, InsertCompany } from "@shared/schema";
-import { useCreateCompany } from "@/hooks/use-companies";
+import { insertCompanySchema, InsertCompany, Company } from "@shared/schema";
+import { useCreateCompany, useUpdateCompany } from "@/hooks/use-companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,23 +13,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { Plus, Edit2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
-export function CompanyForm() {
+interface CompanyFormProps {
+  company?: Company;
+}
+
+export function CompanyForm({ company }: CompanyFormProps) {
   const [open, setOpen] = useState(false);
   const [loadingCnpj, setLoadingCnpj] = useState(false);
   const createCompany = useCreateCompany();
+  const updateCompany = useUpdateCompany();
 
   const form = useForm<InsertCompany>({
     resolver: zodResolver(insertCompanySchema),
     defaultValues: {
-      name: "",
-      document: "",
-      email: "",
-      address: "",
+      name: company?.name || "",
+      document: company?.document || "",
+      email: company?.email || "",
+      address: company?.address || "",
     },
   });
+
+  useEffect(() => {
+    if (company && open) {
+      form.reset({
+        name: company.name,
+        document: company.document,
+        email: company.email,
+        address: company.address,
+      });
+    }
+  }, [company, open, form]);
 
   const fetchCnpjData = async (cnpj: string) => {
     const cleanCnpj = cnpj.replace(/\D/g, '');
@@ -50,25 +66,40 @@ export function CompanyForm() {
   };
 
   const onSubmit = (data: InsertCompany) => {
-    createCompany.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-        form.reset();
-      },
-    });
+    if (company) {
+      updateCompany.mutate({ id: company.id, data }, {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      });
+    } else {
+      createCompany.mutate(data, {
+        onSuccess: () => {
+          setOpen(false);
+          form.reset();
+        },
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="btn-primary gap-2">
-          <Plus className="w-4 h-4" />
-          Adicionar Empresa
-        </Button>
+        {company ? (
+          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-primary">
+            <Edit2 className="w-4 h-4" />
+          </Button>
+        ) : (
+          <Button className="btn-primary gap-2">
+            <Plus className="w-4 h-4" />
+            Adicionar Empresa
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova Empresa</DialogTitle>
+          <DialogTitle>{company ? "Editar Empresa" : "Cadastrar Nova Empresa"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
@@ -141,8 +172,8 @@ export function CompanyForm() {
               )}
             />
             <div className="flex justify-end pt-4">
-              <Button type="submit" disabled={createCompany.isPending}>
-                {createCompany.isPending ? "Criando..." : "Criar Empresa"}
+              <Button type="submit" disabled={createCompany.isPending || updateCompany.isPending}>
+                {company ? (updateCompany.isPending ? "Salvando..." : "Salvar Alterações") : (createCompany.isPending ? "Criando..." : "Criar Empresa")}
               </Button>
             </div>
           </form>
