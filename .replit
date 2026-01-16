@@ -43,3 +43,8 @@ outputType = "webview"
 
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+DATABASE_URL_RAILWAY = "postgresql://postgres:KRGLUuWPPSLMDNpFshoggPOruwfamLZk@postgres.railway.internal:5432/railway"
