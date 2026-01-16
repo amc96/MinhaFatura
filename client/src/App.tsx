@@ -15,8 +15,22 @@ import Users from "@/pages/admin/Users";
 import MyCharges from "@/pages/company/MyCharges";
 import MyInvoices from "@/pages/company/MyInvoices";
 import NotFound from "@/pages/NotFound";
+import { PasswordChange } from "@/pages/auth/PasswordChange";
 
 function Router() {
+  const { user } = useAuth();
+
+  if (user?.forcePasswordChange) {
+    return (
+      <Switch>
+        <Route path="/change-password" component={PasswordChange} />
+        <Route>
+          <Redirect to="/change-password" />
+        </Route>
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
       <Route path="/login" component={Login} />

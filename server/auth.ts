@@ -86,6 +86,24 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });
+
+  app.post("/api/change-password", async (req, res, next) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      const { password } = req.body;
+      if (!password || password.length < 6) {
+        return res.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres" });
+      }
+      const hashedPassword = await hashPassword(password);
+      await storage.updateUser(req.user!.id, { 
+        password: hashedPassword,
+        forcePasswordChange: false 
+      });
+      res.sendStatus(200);
+    } catch (err) {
+      next(err);
+    }
+  });
   
   // Register helper for seeding/admin
   app.post("/api/register", async (req, res, next) => {

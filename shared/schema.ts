@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role", { enum: ["admin", "company"] }).default("company").notNull(),
   companyId: integer("company_id"),
+  forcePasswordChange: boolean("force_password_change").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
