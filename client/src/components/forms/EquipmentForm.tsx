@@ -46,6 +46,7 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
       name: "",
       model: "",
       serialNumber: "",
+      assetNumber: "", // patrimônio
       status: "active",
       lastMaintenance: null,
       nextMaintenance: null,
@@ -59,6 +60,7 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
         name: equipment.name,
         model: equipment.model || "",
         serialNumber: equipment.serialNumber || "",
+        assetNumber: equipment.assetNumber || "",
         status: equipment.status,
         lastMaintenance: equipment.lastMaintenance,
         nextMaintenance: equipment.nextMaintenance,
@@ -69,6 +71,7 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
         name: "",
         model: "",
         serialNumber: "",
+        assetNumber: "",
         status: "active",
         lastMaintenance: null,
         nextMaintenance: null,
@@ -171,6 +174,19 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
                   <FormLabel>Número de Série</FormLabel>
                   <FormControl>
                     <Input placeholder="Ex: SN12345678" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="assetNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Patrimônio</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: PAT-001" {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -381,5 +381,34 @@ export async function registerRoutes(
     }
   });
 
+  // === EQUIPMENT MODELS ===
+  app.get('/api/equipment-models', async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const models = await storage.getEquipmentModels();
+    res.json(models);
+  });
+
+  app.post('/api/equipment-models', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const model = await storage.createEquipmentModel(req.body);
+      res.status(201).json(model);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao cadastrar modelo de equipamento" });
+    }
+  });
+
+  app.delete('/api/equipment-models/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteEquipmentModel(id);
+      if (!success) return res.status(404).json({ message: "Modelo não encontrado" });
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao excluir modelo" });
+    }
+  });
+
   return httpServer;
 }

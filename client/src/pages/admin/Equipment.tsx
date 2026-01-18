@@ -50,6 +50,7 @@ export default function EquipmentPage() {
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                   <TableHead>Equipamento</TableHead>
                   <TableHead>Empresa</TableHead>
+                  <TableHead>Patrimônio</TableHead>
                   <TableHead>Modelo / S/N</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -69,6 +70,9 @@ export default function EquipmentPage() {
                         <Building className="w-4 h-4 text-slate-400" />
                         <span className="text-sm">{item.company.name}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm font-medium text-slate-700">{item.assetNumber || '-'}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
