@@ -7,7 +7,8 @@ import {
   Users, 
   LogOut,
   PieChart,
-  FileText
+  FileText,
+  Settings
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 

@@ -65,6 +65,8 @@ export async function registerRoutes(
         title: "Taxa de Serviço - Jan 2026",
         amount: 1500.00,
         dueDate: "2026-01-30",
+        recurringCount: 1,
+        intervalDays: 30,
         status: "pending",
       });
       
@@ -73,6 +75,8 @@ export async function registerRoutes(
         title: "Licença de Software - Q1",
         amount: 5000.00,
         dueDate: "2026-02-15",
+        recurringCount: 1,
+        intervalDays: 30,
         status: "pending",
       });
       
@@ -222,6 +226,8 @@ export async function registerRoutes(
           ...chargeData,
           dueDate,
           boletoFile,
+          recurringCount: 1,
+          intervalDays: 30,
           title: recurringCount > 1 ? `${chargeData.title} (${i + 1}/${recurringCount})` : chargeData.title,
         });
         createdCharges.push(charge);
