@@ -7,6 +7,18 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
 
+declare global {
+  namespace Express {
+    interface User {
+      id: number;
+      username: string;
+      role: "admin" | "company";
+      companyId: number | null;
+      forcePasswordChange: boolean;
+    }
+  }
+}
+
 const scryptAsync = promisify(scrypt);
 
 export async function hashPassword(password: string) {

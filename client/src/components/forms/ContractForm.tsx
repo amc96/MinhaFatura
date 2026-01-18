@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertContractSchema, InsertContract, Company } from "@shared/schema";
-import { useCreateContract } from "@/hooks/use-contracts";
+import { useContracts, useCreateContract } from "@/hooks/use-contracts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
