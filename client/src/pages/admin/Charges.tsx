@@ -79,7 +79,7 @@ export default function Charges() {
                   size="icon"
                   className="text-slate-500 hover:text-destructive"
                   onClick={() => {
-                    if (confirm("Tem certeza que deseja excluir esta cobrança?")) {
+                    if (confirm("Tem certeza que deseja excluir esta fatura?")) {
                       deleteCharge.mutate(charge.id);
                     }
                   }}
@@ -118,7 +118,7 @@ export default function Charges() {
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : (
-            <ChargeTable data={charges} emptyMessage="Nenhuma cobrança encontrada." />
+            <ChargeTable data={charges} emptyMessage="Nenhuma fatura encontrada." />
           )}
         </CardContent>
       </Card>

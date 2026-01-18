@@ -9,7 +9,9 @@ import {
   PieChart,
   FileText,
   Settings,
-  Settings2
+  Settings2,
+  ListPlus,
+  Wallet
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -17,23 +19,41 @@ export function Sidebar() {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
 
-  const adminLinks = [
+  const adminSections = [
     { href: "/admin/dashboard", icon: LayoutDashboard, label: "Painel" },
-    { href: "/admin/companies", icon: Building2, label: "Empresas" },
-    { href: "/admin/charges", icon: Receipt, label: "Cobranças" },
-    { href: "/admin/invoices", icon: FileText, label: "Notas Fiscais" },
-    { href: "/admin/contracts", icon: FileText, label: "Contratos" },
-    { href: "/admin/equipment", icon: Settings, label: "Equipamentos" },
-    { href: "/admin/equipment-models", icon: Settings2, label: "Modelos" },
-    { href: "/admin/users", icon: Users, label: "Usuários" },
+    {
+      label: "Cadastro",
+      icon: ListPlus,
+      items: [
+        { href: "/admin/companies", icon: Building2, label: "Empresa" },
+        { href: "/admin/equipment-models", icon: Settings2, label: "Modelo" },
+        { href: "/admin/equipment", icon: Settings, label: "Equipamento" },
+        { href: "/admin/users", icon: Users, label: "Usuário" },
+        { href: "/admin/contracts", icon: FileText, label: "Contratos" },
+      ]
+    },
+    {
+      label: "Financeiro",
+      icon: Wallet,
+      items: [
+        { href: "/admin/invoices", icon: FileText, label: "Notas Fiscais" },
+        { href: "/admin/charges", icon: Receipt, label: "Faturas" },
+      ]
+    },
   ];
 
-  const companyLinks = [
-    { href: "/portal/charges", icon: Receipt, label: "Minhas Cobranças" },
-    { href: "/portal/invoices", icon: FileText, label: "Minhas Notas Fiscais" },
+  const companySections = [
+    {
+      label: "Financeiro",
+      icon: Wallet,
+      items: [
+        { href: "/portal/invoices", icon: FileText, label: "Minhas Notas Fiscais" },
+        { href: "/portal/charges", icon: Receipt, label: "Minhas Faturas" },
+      ]
+    }
   ];
 
-  const links = user?.role === "admin" ? adminLinks : companyLinks;
+  const sections = user?.role === "admin" ? adminSections : companySections;
 
   return (
     <div className="h-screen w-64 bg-slate-900 text-white flex flex-col fixed left-0 top-0 border-r border-slate-800">
@@ -44,25 +64,53 @@ export function Sidebar() {
         <span className="font-display font-bold text-xl tracking-tight">FinControl</span>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
-        {links.map((link) => {
-          const isActive = location === link.href;
-          return (
-            <Link key={link.href} href={link.href}>
-              <div
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
-                  isActive
-                    ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                <link.icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-500 group-hover:text-white")} />
-                {link.label}
-              </div>
-            </Link>
-          );
-        })}
+      <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
+        {sections.map((section, idx) => (
+          <div key={idx} className="space-y-1">
+            {section.href ? (
+              <Link href={section.href}>
+                <div
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
+                    location === section.href
+                      ? "bg-primary text-white shadow-lg shadow-primary/20"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  <section.icon className={cn("w-5 h-5", location === section.href ? "text-white" : "text-slate-500")} />
+                  {section.label}
+                </div>
+              </Link>
+            ) : (
+              <>
+                <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <section.icon className="w-4 h-4" />
+                  {section.label}
+                </div>
+                <div className="space-y-1 ml-2 border-l border-slate-800 pl-2">
+                  {section.items?.map((link) => {
+                    const isActive = location === link.href;
+                    return (
+                      <Link key={link.href} href={link.href}>
+                        <div
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
+                            isActive
+                              ? "bg-white/10 text-white"
+                              : "text-slate-400 hover:text-white hover:bg-white/5"
+                          )}
+                        >
+                          <link.icon className={cn("w-4 h-4", isActive ? "text-white" : "text-slate-500")} />
+                          {link.label}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        ))}
       </nav>
 
       <div className="p-4 border-t border-slate-800">
