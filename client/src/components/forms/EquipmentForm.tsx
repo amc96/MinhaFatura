@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertEquipmentSchema, InsertEquipment, Equipment } from "@shared/schema";
+import { insertEquipmentSchema, InsertEquipment, Equipment, EquipmentModel } from "@shared/schema";
 import { useCreateEquipment, useUpdateEquipment } from "@/hooks/use-equipment";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,9 +20,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCompanies } from "@/hooks/use-companies";
+import { useQuery } from "@tanstack/react-query";
 
 interface EquipmentFormProps {
   equipment?: Equipment;
@@ -36,6 +37,7 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
   const setOpen = setExternalOpen ?? setInternalOpen;
 
   const { data: companies } = useCompanies();
+  const { data: models } = useQuery<EquipmentModel[]>({ queryKey: ["/api/equipment-models"] });
   const createEquipment = useCreateEquipment();
   const updateEquipment = useUpdateEquipment();
 
@@ -43,10 +45,11 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
     resolver: zodResolver(insertEquipmentSchema),
     defaultValues: {
       companyId: 0,
+      modelId: 0,
       name: "",
-      model: "",
       serialNumber: "",
-      assetNumber: "", // patrimônio
+      assetNumber: "",
+      purchaseValue: 0,
       status: "active",
       lastMaintenance: null,
       nextMaintenance: null,
@@ -57,10 +60,11 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
     if (equipment && open) {
       form.reset({
         companyId: equipment.companyId,
+        modelId: equipment.modelId,
         name: equipment.name,
-        model: equipment.model || "",
         serialNumber: equipment.serialNumber || "",
         assetNumber: equipment.assetNumber || "",
+        purchaseValue: Number(equipment.purchaseValue) || 0,
         status: equipment.status,
         lastMaintenance: equipment.lastMaintenance,
         nextMaintenance: equipment.nextMaintenance,
@@ -68,10 +72,11 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
     } else if (!equipment && open) {
       form.reset({
         companyId: 0,
+        modelId: 0,
         name: "",
-        model: "",
         serialNumber: "",
         assetNumber: "",
+        purchaseValue: 0,
         status: "active",
         lastMaintenance: null,
         nextMaintenance: null,
@@ -142,51 +147,80 @@ export function EquipmentForm({ equipment, open: externalOpen, onOpenChange: set
             />
             <FormField
               control={form.control}
+              name="modelId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Modelo do Equipamento</FormLabel>
+                  <Select 
+                    onValueChange={(val) => field.onChange(parseInt(val))} 
+                    value={field.value ? field.value.toString() : ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o modelo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {models?.map((model) => (
+                        <SelectItem key={model.id} value={model.id.toString()}>
+                          {model.brand} - {model.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do Equipamento</FormLabel>
+                  <FormLabel>Identificação (Nome)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Impressora Laser" {...field} />
+                    <Input placeholder="Ex: Impressora Recepção" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="assetNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Patrimônio</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: PAT-001" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="serialNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nº de Série</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: SN123" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
-              name="model"
+              name="purchaseValue"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Modelo</FormLabel>
+                  <FormLabel>Valor de Compra (R$)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: HP LaserJet Pro" {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="serialNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número de Série</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: SN12345678" {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="assetNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Patrimônio</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: PAT-001" {...field} value={field.value || ''} />
+                    <Input type="number" step="0.01" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

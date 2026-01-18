@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, Loader2, Settings2 } from "lucide-react";
+import { Plus, Trash2, Loader2, Settings2, Tag } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -45,6 +45,7 @@ export default function EquipmentModelsPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/equipment-models"] });
       setOpen(false);
       toast({ title: "Sucesso", description: "Modelo cadastrado com sucesso" });
+      form.reset();
     },
   });
 
@@ -62,6 +63,7 @@ export default function EquipmentModelsPage() {
     resolver: zodResolver(insertEquipmentModelSchema),
     defaultValues: {
       name: "",
+      brand: "",
       description: "",
     },
   });
@@ -75,7 +77,7 @@ export default function EquipmentModelsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Modelos de Equipamentos</h1>
-          <p className="text-slate-500 mt-2">Cadastre os modelos base para os equipamentos.</p>
+          <p className="text-slate-500 mt-2">Cadastre as marcas e modelos base para os equipamentos.</p>
         </div>
         
         <Dialog open={open} onOpenChange={setOpen}>
@@ -93,12 +95,25 @@ export default function EquipmentModelsPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
                 <FormField
                   control={form.control}
+                  name="brand"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Marca</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: HP, Dell, Brother..." {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nome do Modelo</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: Impressora HP M404n" {...field} />
+                        <Input placeholder="Ex: LaserJet Pro M404n" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -109,7 +124,7 @@ export default function EquipmentModelsPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Descrição</FormLabel>
+                      <FormLabel>Descrição do Equipamento</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Detalhes técnicos, especificações..." 
@@ -143,7 +158,8 @@ export default function EquipmentModelsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                  <TableHead>Nome</TableHead>
+                  <TableHead>Marca</TableHead>
+                  <TableHead>Modelo</TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -152,10 +168,13 @@ export default function EquipmentModelsPage() {
                 {models?.map((model) => (
                   <TableRow key={model.id} className="table-row-hover">
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Settings2 className="w-4 h-4 text-slate-400" />
-                        <span className="font-medium text-slate-900">{model.name}</span>
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-slate-400" />
+                        <span className="font-medium text-slate-900">{model.brand || '-'}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-slate-700">{model.name}</span>
                     </TableCell>
                     <TableCell className="max-w-md truncate text-slate-500 text-sm">
                       {model.description || '-'}
@@ -178,7 +197,7 @@ export default function EquipmentModelsPage() {
                 ))}
                 {models?.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-slate-500">
+                    <TableCell colSpan={4} className="text-center py-8 text-slate-500">
                       Nenhum modelo cadastrado.
                     </TableCell>
                   </TableRow>

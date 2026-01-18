@@ -78,10 +78,11 @@ export const contractsRelations = relations(contracts, ({ one }) => ({
 export const equipment = pgTable("equipment", {
   id: serial("id").primaryKey(),
   companyId: integer("company_id").notNull(),
+  modelId: integer("model_id").notNull(),
   name: text("name").notNull(),
-  model: text("model"),
   serialNumber: text("serial_number"),
   assetNumber: text("asset_number"), // patrimônio
+  purchaseValue: decimal("purchase_value", { precision: 10, scale: 2 }),
   status: text("status", { enum: ["active", "maintenance", "inactive"] }).default("active").notNull(),
   lastMaintenance: date("last_maintenance"),
   nextMaintenance: date("next_maintenance"),
@@ -91,6 +92,7 @@ export const equipment = pgTable("equipment", {
 export const equipmentModels = pgTable("equipment_models", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  brand: text("brand"), // marca
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -99,6 +101,10 @@ export const equipmentRelations = relations(equipment, ({ one }) => ({
   company: one(companies, {
     fields: [equipment.companyId],
     references: [companies.id],
+  }),
+  model: one(equipmentModels, {
+    fields: [equipment.modelId],
+    references: [equipmentModels.id],
   }),
 }));
 
@@ -130,7 +136,9 @@ export const insertChargeSchema = createInsertSchema(charges).omit({ id: true, c
 });
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, createdAt: true });
 export const insertContractSchema = createInsertSchema(contracts).omit({ id: true, createdAt: true });
-export const insertEquipmentSchema = createInsertSchema(equipment).omit({ id: true, createdAt: true });
+export const insertEquipmentSchema = createInsertSchema(equipment).omit({ id: true, createdAt: true }).extend({
+  purchaseValue: z.coerce.number().optional(),
+});
 export const insertEquipmentModelSchema = createInsertSchema(equipmentModels).omit({ id: true, createdAt: true });
 
 export type User = typeof users.$inferSelect;

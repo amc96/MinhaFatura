@@ -11,9 +11,14 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Loader2, Settings, Trash2, Building, Pencil } from "lucide-react";
+import { Loader2, Settings, Trash2, Building, Pencil, Tag, DollarSign } from "lucide-react";
 import { useState } from "react";
-import { Equipment } from "@shared/schema";
+import { Equipment, EquipmentModel } from "@shared/schema";
+
+type EquipmentWithRelations = Equipment & { 
+  company: { name: string };
+  model: EquipmentModel;
+};
 
 export default function EquipmentPage() {
   const { data: equipment, isLoading } = useEquipment();
@@ -48,16 +53,17 @@ export default function EquipmentPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                  <TableHead>Equipamento</TableHead>
+                  <TableHead>Identificação</TableHead>
                   <TableHead>Empresa</TableHead>
-                  <TableHead>Patrimônio</TableHead>
-                  <TableHead>Modelo / S/N</TableHead>
+                  <TableHead>Marca / Modelo</TableHead>
+                  <TableHead>Patrimônio / S/N</TableHead>
+                  <TableHead>Vlr. Compra</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {equipment?.map((item) => (
+                {(equipment as EquipmentWithRelations[])?.map((item) => (
                   <TableRow key={item.id} className="table-row-hover">
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -72,12 +78,26 @@ export default function EquipmentPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm font-medium text-slate-700">{item.assetNumber || '-'}</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1">
+                          <Tag className="w-3 h-3 text-slate-400" />
+                          <span className="text-sm font-medium text-slate-700">{item.model.brand}</span>
+                        </div>
+                        <span className="text-xs text-slate-500">{item.model.name}</span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="text-sm text-slate-700">{item.model || '-'}</span>
-                        <span className="text-[10px] text-slate-400 font-mono">{item.serialNumber || '-'}</span>
+                        <span className="text-sm font-medium text-slate-700">Pat: {item.assetNumber || '-'}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">S/N: {item.serialNumber || '-'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-slate-600">
+                        <DollarSign className="w-3 h-3" />
+                        <span className="text-sm">
+                          {item.purchaseValue ? Number(item.purchaseValue).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -114,7 +134,7 @@ export default function EquipmentPage() {
                 ))}
                 {equipment?.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                    <TableCell colSpan={7} className="text-center py-8 text-slate-500">
                       Nenhum equipamento encontrado.
                     </TableCell>
                   </TableRow>

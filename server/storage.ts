@@ -229,21 +229,25 @@ export class DatabaseStorage implements IStorage {
     return !!deleted;
   }
 
-  async getEquipment(companyId?: number): Promise<(Equipment & { company: Company })[]> {
+  async getEquipment(companyId?: number): Promise<(Equipment & { company: Company; model: EquipmentModel })[]> {
     const query = db.select({
         id: equipment.id,
         companyId: equipment.companyId,
+        modelId: equipment.modelId,
         name: equipment.name,
-        model: equipment.model,
         serialNumber: equipment.serialNumber,
+        assetNumber: equipment.assetNumber,
+        purchaseValue: equipment.purchaseValue,
         status: equipment.status,
         lastMaintenance: equipment.lastMaintenance,
         nextMaintenance: equipment.nextMaintenance,
         createdAt: equipment.createdAt,
-        company: companies
+        company: companies,
+        model: equipmentModels
       })
       .from(equipment)
       .innerJoin(companies, eq(equipment.companyId, companies.id))
+      .innerJoin(equipmentModels, eq(equipment.modelId, equipmentModels.id))
       .orderBy(desc(equipment.createdAt));
 
     if (companyId) {
