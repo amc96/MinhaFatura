@@ -11,13 +11,27 @@ import {
   Settings,
   Settings2,
   ListPlus,
-  Wallet
+  Wallet,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
 
 export function Sidebar() {
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    "Cadastro": true,
+    "Financeiro": true
+  });
+
+  const toggleSection = (label: string) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
 
   const adminSections = [
     { href: "/admin/dashboard", icon: LayoutDashboard, label: "Painel" },
@@ -83,30 +97,42 @@ export function Sidebar() {
               </Link>
             ) : (
               <>
-                <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                  <section.icon className="w-4 h-4" />
-                  {section.label}
+                <div 
+                  className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between cursor-pointer hover:text-slate-300 transition-colors"
+                  onClick={() => toggleSection(section.label)}
+                >
+                  <div className="flex items-center gap-2">
+                    <section.icon className="w-4 h-4" />
+                    {section.label}
+                  </div>
+                  {openSections[section.label] ? (
+                    <ChevronDown className="w-3 h-3" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3" />
+                  )}
                 </div>
-                <div className="space-y-1 ml-2 border-l border-slate-800 pl-2">
-                  {section.items?.map((link) => {
-                    const isActive = location === link.href;
-                    return (
-                      <Link key={link.href} href={link.href}>
-                        <div
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
-                            isActive
-                              ? "bg-white/10 text-white"
-                              : "text-slate-400 hover:text-white hover:bg-white/5"
-                          )}
-                        >
-                          <link.icon className={cn("w-4 h-4", isActive ? "text-white" : "text-slate-500")} />
-                          {link.label}
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
+                {openSections[section.label] && (
+                  <div className="space-y-1 ml-2 border-l border-slate-800 pl-2 animate-in slide-in-from-top-1 duration-200">
+                    {section.items?.map((link) => {
+                      const isActive = location === link.href;
+                      return (
+                        <Link key={link.href} href={link.href}>
+                          <div
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
+                              isActive
+                                ? "bg-white/10 text-white"
+                                : "text-slate-400 hover:text-white hover:bg-white/5"
+                            )}
+                          >
+                            <link.icon className={cn("w-4 h-4", isActive ? "text-white" : "text-slate-500")} />
+                            {link.label}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </>
             )}
           </div>
