@@ -75,6 +75,25 @@ export const contractsRelations = relations(contracts, ({ one }) => ({
   }),
 }));
 
+export const equipment = pgTable("equipment", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull(),
+  name: text("name").notNull(),
+  model: text("model"),
+  serialNumber: text("serial_number"),
+  status: text("status", { enum: ["active", "maintenance", "inactive"] }).default("active").notNull(),
+  lastMaintenance: date("last_maintenance"),
+  nextMaintenance: date("next_maintenance"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const equipmentRelations = relations(equipment, ({ one }) => ({
+  company: one(companies, {
+    fields: [equipment.companyId],
+    references: [companies.id],
+  }),
+}));
+
 export const chargesRelations = relations(charges, ({ one, many }) => ({
   company: one(companies, {
     fields: [charges.companyId],
@@ -103,6 +122,7 @@ export const insertChargeSchema = createInsertSchema(charges).omit({ id: true, c
 });
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, createdAt: true });
 export const insertContractSchema = createInsertSchema(contracts).omit({ id: true, createdAt: true });
+export const insertEquipmentSchema = createInsertSchema(equipment).omit({ id: true, createdAt: true });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -110,6 +130,8 @@ export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Contract = typeof contracts.$inferSelect;
 export type InsertContract = z.infer<typeof insertContractSchema>;
+export type Equipment = typeof equipment.$inferSelect;
+export type InsertEquipment = z.infer<typeof insertEquipmentSchema>;
 export type Charge = typeof charges.$inferSelect;
 export type InsertCharge = z.infer<typeof insertChargeSchema>;
 export type Invoice = typeof invoices.$inferSelect;

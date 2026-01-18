@@ -328,5 +328,52 @@ export async function registerRoutes(
     }
   });
 
+  // === EQUIPMENT ===
+  app.get('/api/equipment', async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    let companyId = req.query.companyId ? Number(req.query.companyId) : undefined;
+    if (req.user!.role === 'company') {
+      companyId = req.user!.companyId!;
+    }
+
+    const items = await storage.getEquipment(companyId);
+    res.json(items);
+  });
+
+  app.post('/api/equipment', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const item = await storage.createEquipment(req.body);
+      res.status(201).json(item);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao cadastrar equipamento" });
+    }
+  });
+
+  app.patch('/api/equipment/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const item = await storage.updateEquipment(id, req.body);
+      if (!item) return res.status(404).json({ message: "Equipamento não encontrado" });
+      res.json(item);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao atualizar equipamento" });
+    }
+  });
+
+  app.delete('/api/equipment/:id', async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== 'admin') return res.sendStatus(401);
+    try {
+      const id = Number(req.params.id);
+      const success = await storage.deleteEquipment(id);
+      if (!success) return res.status(404).json({ message: "Equipamento não encontrado" });
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao excluir equipamento" });
+    }
+  });
+
   return httpServer;
 }

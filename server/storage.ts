@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, companies, charges, invoices, contracts, type User, type InsertUser, type Company, type InsertCompany, type Charge, type InsertCharge, type Invoice, type InsertInvoice, type Contract, type InsertContract } from "@shared/schema";
+import { users, companies, charges, invoices, contracts, equipment, type User, type InsertUser, type Company, type InsertCompany, type Charge, type InsertCharge, type Invoice, type InsertInvoice, type Contract, type InsertContract, type Equipment, type InsertEquipment } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
@@ -19,6 +19,12 @@ export interface IStorage {
   getContracts(companyId?: number): Promise<(Contract & { company: Company })[]>;
   createContract(contract: InsertContract): Promise<Contract>;
   deleteContract(id: number): Promise<boolean>;
+
+  // Equipment
+  getEquipment(companyId?: number): Promise<(Equipment & { company: Company })[]>;
+  createEquipment(eq: InsertEquipment): Promise<Equipment>;
+  updateEquipment(id: number, eq: Partial<InsertEquipment>): Promise<Equipment | undefined>;
+  deleteEquipment(id: number): Promise<boolean>;
 
   // Charges
   getCharges(companyId?: number): Promise<(Charge & { company: Company })[]>;
@@ -215,6 +221,50 @@ export class DatabaseStorage implements IStorage {
 
   async deleteContract(id: number): Promise<boolean> {
     const [deleted] = await db.delete(contracts).where(eq(contracts.id, id)).returning();
+    return !!deleted;
+  }
+
+  async getEquipment(companyId?: number): Promise<(Equipment & { company: Company })[]> {
+    const query = db.select({
+        id: equipment.id,
+        companyId: equipment.companyId,
+        name: equipment.name,
+        model: equipment.model,
+        serialNumber: equipment.serialNumber,
+        status: equipment.status,
+        lastMaintenance: equipment.lastMaintenance,
+        nextMaintenance: equipment.nextMaintenance,
+        createdAt: equipment.createdAt,
+        company: companies
+      })
+      .from(equipment)
+      .innerJoin(companies, eq(equipment.companyId, companies.id))
+      .orderBy(desc(equipment.createdAt));
+
+    if (companyId) {
+      query.where(eq(equipment.companyId, companyId));
+    }
+
+    // @ts-ignore
+    return await query;
+  }
+
+  async createEquipment(item: InsertEquipment): Promise<Equipment> {
+    const [newItem] = await db.insert(equipment).values(item as any).returning();
+    return newItem;
+  }
+
+  async updateEquipment(id: number, item: Partial<InsertEquipment>): Promise<Equipment | undefined> {
+    const [updated] = await db
+      .update(equipment)
+      .set(item as any)
+      .where(eq(equipment.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteEquipment(id: number): Promise<boolean> {
+    const [deleted] = await db.delete(equipment).where(eq(equipment.id, id)).returning();
     return !!deleted;
   }
 }

@@ -21,6 +21,7 @@ export function Sidebar() {
     { href: "/admin/charges", icon: Receipt, label: "Cobranças" },
     { href: "/admin/invoices", icon: FileText, label: "Notas Fiscais" },
     { href: "/admin/contracts", icon: FileText, label: "Contratos" },
+    { href: "/admin/equipment", icon: Settings, label: "Equipamentos" },
     { href: "/admin/users", icon: Users, label: "Usuários" },
   ];
 
