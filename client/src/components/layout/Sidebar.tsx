@@ -8,7 +8,8 @@ import {
   LogOut,
   PieChart,
   FileText,
-  Settings
+  Settings,
+  Settings2
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -23,6 +24,7 @@ export function Sidebar() {
     { href: "/admin/invoices", icon: FileText, label: "Notas Fiscais" },
     { href: "/admin/contracts", icon: FileText, label: "Contratos" },
     { href: "/admin/equipment", icon: Settings, label: "Equipamentos" },
+    { href: "/admin/equipment-models", icon: Settings2, label: "Modelos" },
     { href: "/admin/users", icon: Users, label: "Usuários" },
   ];
 

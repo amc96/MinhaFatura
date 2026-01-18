@@ -14,6 +14,7 @@ import AdminInvoices from "@/pages/admin/Invoices";
 import Users from "@/pages/admin/Users";
 import Contracts from "@/pages/admin/Contracts";
 import Equipment from "@/pages/admin/Equipment";
+import EquipmentModels from "@/pages/admin/EquipmentModels";
 import MyCharges from "@/pages/company/MyCharges";
 import MyInvoices from "@/pages/company/MyInvoices";
 import NotFound from "@/pages/NotFound";
@@ -57,6 +58,9 @@ function Router() {
       </Route>
       <Route path="/admin/equipment">
         <Layout><Equipment /></Layout>
+      </Route>
+      <Route path="/admin/equipment-models">
+        <Layout><EquipmentModels /></Layout>
       </Route>
       <Route path="/portal/charges">
         <Layout><MyCharges /></Layout>
